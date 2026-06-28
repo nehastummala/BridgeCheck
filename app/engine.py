@@ -247,28 +247,16 @@ def score_resource(resource: models.Resource, session: UserSession) -> int:
 
 
 def rank_resources(session: UserSession, db: Session, limit: int = 4) -> list[dict]:
-    resources = db.query(models.Resource).all()
-
+    resources = db.query(models.Resource).filter(models.Resource.is_active == True).all()
     scored = []
 
     for r in resources:
-        tags = r.tags or []
-        access_modes = r.access_modes or []
+        sc = score_resource(r, session)
 
-        sc = 0
-
-        if session.support_type and session.support_type in tags:
-            sc += 4
-
-        matched_barriers = []
-        for b in session.barriers:
-            if b in tags:
-                sc += 3
-                matched_barriers.append(b)
-
-        for a in session.access_prefs:
-            if a in access_modes:
-                sc += 2
+        matched_barriers = [
+            b for b in session.barriers
+            if b in (r.barriers or [])
+        ]
 
         why_parts = []
         for b in matched_barriers[:2]:
@@ -286,7 +274,11 @@ def rank_resources(session: UserSession, db: Session, limit: int = 4) -> list[di
 
     scored.sort(key=lambda x: x["score"], reverse=True)
 
-    top = scored[:limit]
+    top = [x for x in scored if x["score"] > 0][:limit]
+
+    if not top:
+        top = scored[:limit]
+
     if top:
         top[0]["is_top_match"] = True
 
