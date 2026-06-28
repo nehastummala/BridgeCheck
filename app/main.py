@@ -40,7 +40,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",                    # local frontend dev server
         "http://localhost:5500",                    # VS Code Live Server
-        "https://bridgecheck.org",                  # production domain
+        "https://bridgecheck.org", 
+        "https://bridge-check-olive.vercel.app",# production domain
         "https://bridge-check-xi.vercel.app",       # Vercel deployment
     ],
     allow_methods=["*"],
