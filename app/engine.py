@@ -440,19 +440,22 @@ def _confidence_reasons(session: UserSession, ranked: list, conf: int) -> list[d
 
 def _serialize_resources(ranked: list[dict]) -> list[dict]:
     out = []
+
     for item in ranked:
         r = item["resource"]
+
         out.append({
-            "id":               r.id,
-            "name":             r.name,
-            "description":      r.description,
-            "cost_badge":       r.cost_badge,
-            "tags":             r.tags or [],
-            "access_modes":     r.access_modes or [],
-            "links":            r.links or [],
-            "why_text":         item["why_text"],
-            "is_top_match":     item["is_top_match"],
-            "score":            item["score"],
-            "matched_barriers": item["matched_barriers"],
+            "id": r.id,
+            "name": r.name,
+            "description": r.description,
+            "cost_badge": r.cost_badge,
+            "tags": r.tags or [],
+            "access_modes": r.access_modes or [],
+            "links": r.links or [],
+            "why_text": item.get("why_text", ""),
+            "is_top_match": item.get("is_top_match", False),
+            "score": item.get("score", 0),
+            "matched_barriers": item.get("matched_barriers", []),
         })
+
     return out
