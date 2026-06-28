@@ -220,25 +220,23 @@ def build_barrier_profile(session: UserSession) -> list[dict]:
 # ─────────────────────────────────────────────────────────────
 def score_resource(resource: models.Resource, session: UserSession) -> int:
     score = 0
-    reasons: list[str] = []
 
-    # Support type match
-    if session.support_type and session.support_type in (resource.tags or []):
+    tags = resource.tags or []
+    barriers = getattr(resource, "barriers", None) or tags
+    access_modes = resource.access_modes or []
+
+    if session.support_type and session.support_type in tags:
         score += 4
 
-    # Barrier matches
     for b in session.barriers:
-        if b in (resource.barriers or []):
+        if b in barriers or b in tags:
             score += 3
-            reasons.append(b)
 
-    # Access preference matches
     for a in session.access_prefs:
-        if a in (resource.access_modes or []):
+        if a in access_modes:
             score += 2
 
-    # Urgency bonus — crisis mode or waittime barrier + resource is fast
-    if "crisis" in (resource.tags or []) and (
+    if "crisis" in tags and (
         session.support_type == "crisis"
         or "waittime" in session.barriers
         or session.adaptive_answer in ("today", "this_week", "crisis_first")
@@ -257,7 +255,7 @@ def rank_resources(session: UserSession, db: Session, limit: int = 4) -> list[di
 
         matched_barriers = [
             b for b in session.barriers
-            if b in (r.barriers or [])
+            if b in ((getattr(r, "barriers", None) or []) + (r.tags or []))
         ]
 
         why_parts = []
