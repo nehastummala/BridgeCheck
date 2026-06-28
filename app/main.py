@@ -113,29 +113,19 @@ def adaptive_question(req: schemas.AdaptiveQuestionRequest):
 # ── ANALYZE (main BridgeLogic call) ───────────────────────────
 @app.post("/api/analyze", response_model=schemas.AnalyzeResponse)
 def analyze(req: schemas.AnalyzeRequest, db: Session = Depends(get_db)):
-    """
-    Full BridgeLogic™ engine run.
-    Takes the user's complete session answers and returns:
-      - Confidence score + reasons
-      - BridgeLogic summary
-      - Barrier profile with navigation-priority weights
-      - Ranked resource matches with why-text
-      - Action plan
-    """
     session = UserSession(
-        support_type    = req.support_type,
-        barriers        = req.barriers,
-        adaptive_answer = req.adaptive_answer,
-        access_prefs    = req.access_prefs,
-        zip_code        = req.zip_code,
-        skipped_q3      = req.adaptive_answer is None,
+        support_type=req.support_type,
+        barriers=req.barriers,
+        adaptive_answer=req.adaptive_answer,
+        access_prefs=req.access_prefs,
+        zip_code=req.zip_code,
+        skipped_q3=req.adaptive_answer is None,
     )
 
     result = run_bridgelogic(session, db)
 
-    if not result["resources"]:
-        fallback_resources = db.query(models.Resource).filter(models.Resource.is_active == True).limit(4).all()
-
+    if not result.get("resources"):
+        fallback_resources = db.query(models.Resource).limit(4).all()
         result["resources"] = [
             {
                 "id": r.id,
@@ -145,26 +135,25 @@ def analyze(req: schemas.AnalyzeRequest, db: Session = Depends(get_db)):
                 "tags": r.tags or [],
                 "access_modes": r.access_modes or [],
                 "links": r.links or [],
-                "why_text": "This resource is included as a verified support option based on your preferences.",
+                "why_text": "Verified BridgeCheck resource.",
                 "is_top_match": i == 0,
                 "score": 1,
-                "matched_barriers": session.barriers,
+                "matched_barriers": req.barriers,
             }
             for i, r in enumerate(fallback_resources)
         ]
 
-    # Log anonymous aggregate data (no PII)
     _log_assessment(session, result, db)
 
     return schemas.AnalyzeResponse(
-        confidence      = schemas.ConfidenceSchema(**result["confidence"]),
-        summary         = schemas.SummarySchema(**result["summary"]),
-        barrier_profile = [schemas.BarrierProfileItem(**b) for b in result["barrier_profile"]],
-        why_reasons     = result["why_reasons"],
-        resources       = [schemas.ResourceSchema(**r) for r in result["resources"]],
-        action_plan     = [schemas.ActionStepSchema(**s) for s in result["action_plan"]],
-        factors_analyzed= result["factors_analyzed"],
-        zip_code        = result["zip_code"],
+        confidence=schemas.ConfidenceSchema(**result["confidence"]),
+        summary=schemas.SummarySchema(**result["summary"]),
+        barrier_profile=[schemas.BarrierProfileItem(**b) for b in result["barrier_profile"]],
+        why_reasons=result["why_reasons"],
+        resources=[schemas.ResourceSchema(**r) for r in result["resources"]],
+        action_plan=[schemas.ActionStepSchema(**s) for s in result["action_plan"]],
+        factors_analyzed=result["factors_analyzed"],
+        zip_code=result["zip_code"],
     )
 
 
