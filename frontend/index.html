@@ -1125,13 +1125,28 @@ function renderResults(data) {
     const accessChips = (r.access_modes || []).map(a =>
       `<span class="chip"><i class="ti ti-${a==='video'?'video':a==='phone'?'phone':a==='text'?'message':'map-pin'}" style="font-size:11px"></i>${ACCESS_LABELS[a]||a}</span>`
     ).join('');
-    return `<div class="resource-card${r.is_top_match ? ' top-match' : ''}">
-      <div class="resource-header">
-        ${r.is_top_match ? '<span class="badge badge-top">Top match</span>' : ''}
-        <span class="badge ${r.cost_badge==='free'?'badge-free':'badge-low'}">${r.cost_badge==='free'?'Free':'Low cost'}</span>
-        <span class="resource-name">${r.name}</span>
-      </div>
+  return `<div class="resource-card${r.is_top_match ? ' top-match' : ''}">
+    <div class="resource-header">
+      ${r.is_top_match ? '<span class="badge badge-top">Top match</span>' : ''}
+
+      <span class="badge ${r.cost_badge==='free'?'badge-free':'badge-low'}">
+        ${r.cost_badge==='free'?'Free':'Low cost'}
+      </span>
+
+      <span class="badge">
+        Score ${r.score}
+      </span>
+
+      <span class="resource-name">${r.name}</span>
+    </div>
       <div class="resource-desc">${r.description}</div>
+      ${r.matched_barriers.length ? `
+      <div style="margin:8px 0;display:flex;flex-wrap:wrap;gap:6px;">
+        ${r.matched_barriers.map(b =>
+          `<span class="chip">${b}</span>`
+        ).join('')}
+      </div>
+      ` : ''}
       ${r.why_text ? `<div class="why-box"><strong>Why this matches you:</strong> ${r.why_text}</div>` : ''}
       <div class="resource-actions">${linksHtml}</div>
       <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;">${accessChips}${zip_code&&r.matched_barriers.includes('transport')?`<span class="chip"><i class="ti ti-map-pin" style="font-size:11px"></i>Near ${zip_code}</span>`:''}</div>
