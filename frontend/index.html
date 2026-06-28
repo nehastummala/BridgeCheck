@@ -896,8 +896,8 @@ function applyZip() {
    falls back to local BridgeLogic automatically — the
    Vercel site keeps working even before backend is live.
 ────────────────────────────────────────────────────────── */
-const API_BASE = "http://localhost:8000";   // ← swap this when you deploy backend
-// const API_BASE = "https://bridgecheck-api.railway.app";  // ← uncomment for prod
+const API_BASE = "https://bridgecheck-production.up.railway.app";
+  // const API_BASE = "https://bridgecheck-api.railway.app";
 let USE_API = true;   // flipped to false automatically if backend is unreachable
 
 async function apiPost(path, body) {
