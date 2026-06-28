@@ -52,8 +52,10 @@ app.add_middleware(
 # ── HEALTH ────────────────────────────────────────────────────
 @app.get("/")
 def health():
-    return {"status": "ok", "engine": "BridgeLogic™ v1.0"}
-
+    return {
+        "status": "ok",
+        "engine": "BridgeLogic™ v1.1 fallback-test"
+    }
 
 # ── RESOURCES ─────────────────────────────────────────────────
 @app.get("/api/resources", response_model=list[schemas.ResourceSchema])
