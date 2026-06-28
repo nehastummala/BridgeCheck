@@ -993,34 +993,50 @@ function pickSteps() {
 }
 
 function runAnalyzingAnimation() {
-  const list = document.getElementById('check-list-dynamic');
-if (!list) return;
-
-list.innerHTML = steps.map((s, i) =>
-  `<div class="check-item" id="chk-${i}">
-    <div class="check-dot"><i class="ti ti-check"></i></div>
-    <span>${s.label || s.l}</span>
-  </div>`
-).join('');
   return new Promise(resolve => {
     const steps = pickSteps();
-    const pcts  = [18, 38, 58, 78, 95];
+    const pcts = [18, 38, 58, 78, 95];
+
+    const list = document.getElementById('check-list-dynamic');
+    if (!list) {
+      resolve();
+      return;
+    }
+
+    list.innerHTML = steps.map((label, i) =>
+      `<div class="check-item" id="chk-${i}">
+        <div class="check-dot"><i class="ti ti-check"></i></div>
+        <span>${label}</span>
+      </div>`
+    ).join('');
+
     steps.forEach((label, i) => {
       setTimeout(() => {
         const el = document.getElementById('chk-' + i);
-        el.querySelector('span').textContent = label;
+        if (!el) return;
+
         el.classList.add('visible', 'active');
+
         if (i > 0) {
           const prev = document.getElementById('chk-' + (i - 1));
-          prev.classList.remove('active'); prev.classList.add('done');
+          if (prev) {
+            prev.classList.remove('active');
+            prev.classList.add('done');
+          }
         }
+
         document.getElementById('meter-fill').style.width = pcts[i] + '%';
         document.getElementById('meter-label').textContent = label;
       }, i * 700);
     });
+
     setTimeout(() => {
-      document.getElementById('chk-4').classList.remove('active');
-      document.getElementById('chk-4').classList.add('done');
+      const last = document.getElementById('chk-' + (steps.length - 1));
+      if (last) {
+        last.classList.remove('active');
+        last.classList.add('done');
+      }
+
       document.getElementById('meter-fill').style.width = '100%';
       document.getElementById('meter-label').textContent = 'Complete';
       resolve();
