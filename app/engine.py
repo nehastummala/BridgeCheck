@@ -396,6 +396,28 @@ def run_bridgelogic(session: UserSession, db: Session) -> dict:
     access_pref = " / ".join(ACCESS_LABELS.get(a, a) for a in session.access_prefs) or "Not specified"
 
     ranked = rank_resources(session, db)
+  return {
+    "confidence": {
+        "score": conf,
+        "label": conf_label,
+        "skipped_q3": session.skipped_q3,
+        "reasons": [],
+    },
+    "summary": {
+        "primary_barrier": "DEBUG",
+        "secondary_barrier": "DEBUG",
+        "preferred_access": "DEBUG",
+        "match_quality": "DEBUG",
+        "next_step": f"DEBUG ranked count: {len(ranked)}",
+        "route": "DEBUG",
+    },
+    "barrier_profile": [],
+    "why_reasons": [f"DEBUG ranked count: {len(ranked)}"],
+    "resources": _serialize_resources(ranked),
+    "action_plan": [],
+    "factors_analyzed": 0,
+    "zip_code": session.zip_code,
+}
     top_name = ranked[0]["resource"].name if ranked else "your top match"
 
     return {
