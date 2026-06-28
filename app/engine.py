@@ -247,9 +247,7 @@ def score_resource(resource: models.Resource, session: UserSession) -> int:
 
 
 def rank_resources(session: UserSession, db: Session, limit: int = 4) -> list[dict]:
-    resources = db.query(models.Resource).filter(
-        models.Resource.is_active == True
-    ).all()
+    resources = db.query(models.Resource).all()
 
     scored = []
 
@@ -293,7 +291,6 @@ def rank_resources(session: UserSession, db: Session, limit: int = 4) -> list[di
         top[0]["is_top_match"] = True
 
     return top
-
 
 # ─────────────────────────────────────────────────────────────
 # WHY-PANEL REASONS
