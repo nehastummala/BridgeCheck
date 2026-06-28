@@ -391,33 +391,11 @@ def run_bridgelogic(session: UserSession, db: Session) -> dict:
     conf = compute_confidence(session)
     conf_label = "High" if conf >= 80 else "Medium" if conf >= 65 else "Moderate"
 
-    primary   = session.barriers[0] if session.barriers else "info"
+    primary = session.barriers[0] if session.barriers else "info"
     secondary = session.barriers[1] if len(session.barriers) > 1 else None
     access_pref = " / ".join(ACCESS_LABELS.get(a, a) for a in session.access_prefs) or "Not specified"
 
     ranked = rank_resources(session, db)
-  return {
-    "confidence": {
-        "score": conf,
-        "label": conf_label,
-        "skipped_q3": session.skipped_q3,
-        "reasons": [],
-    },
-    "summary": {
-        "primary_barrier": "DEBUG",
-        "secondary_barrier": "DEBUG",
-        "preferred_access": "DEBUG",
-        "match_quality": "DEBUG",
-        "next_step": f"DEBUG ranked count: {len(ranked)}",
-        "route": "DEBUG",
-    },
-    "barrier_profile": [],
-    "why_reasons": [f"DEBUG ranked count: {len(ranked)}"],
-    "resources": _serialize_resources(ranked),
-    "action_plan": [],
-    "factors_analyzed": 0,
-    "zip_code": session.zip_code,
-}
     top_name = ranked[0]["resource"].name if ranked else "your top match"
 
     return {
@@ -428,19 +406,19 @@ def run_bridgelogic(session: UserSession, db: Session) -> dict:
             "reasons": _confidence_reasons(session, ranked, conf),
         },
         "summary": {
-            "primary_barrier":   BARRIER_LABELS.get(primary, "Not specified"),
+            "primary_barrier": BARRIER_LABELS.get(primary, "Not specified"),
             "secondary_barrier": BARRIER_LABELS.get(secondary, "None identified") if secondary else "None identified",
-            "preferred_access":  access_pref,
-            "match_quality":     conf_label,
-            "next_step":         recommended_next_step(session, top_name),
-            "route":             "High-confidence route" if session.skipped_q3 else "Standard route",
+            "preferred_access": access_pref,
+            "match_quality": conf_label,
+            "next_step": recommended_next_step(session, top_name),
+            "route": "High-confidence route" if session.skipped_q3 else "Standard route",
         },
-        "barrier_profile":  build_barrier_profile(session),
-        "why_reasons":      build_why_reasons(session),
-        "resources":        _serialize_resources(ranked),
-        "action_plan":      build_action_plan(session, ranked),
+        "barrier_profile": build_barrier_profile(session),
+        "why_reasons": build_why_reasons(session),
+        "resources": _serialize_resources(ranked),
+        "action_plan": build_action_plan(session, ranked),
         "factors_analyzed": len(session.barriers) + 2,
-        "zip_code":         session.zip_code,
+        "zip_code": session.zip_code,
     }
 
 
