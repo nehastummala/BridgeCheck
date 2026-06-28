@@ -126,31 +126,7 @@ def analyze(req: schemas.AnalyzeRequest, db: Session = Depends(get_db)):
 
     result = run_bridgelogic(session, db)
 
-    resources_from_db = list_resources(db)
-
-    result["resources"] = [
-        r.model_dump() for r in resources_from_db[:4]
-    ]
-
-    if not result.get("resources"):
-        fallback_resources = db.query(models.Resource).limit(4).all()
-        result["resources"] = [
-            {
-                "id": r.id,
-                "name": r.name,
-                "description": r.description,
-                "cost_badge": r.cost_badge,
-                "tags": r.tags or [],
-                "access_modes": r.access_modes or [],
-                "links": r.links or [],
-                "why_text": "Verified BridgeCheck resource.",
-                "is_top_match": i == 0,
-                "score": 1,
-                "matched_barriers": req.barriers,
-            }
-            for i, r in enumerate(fallback_resources)
-        ]
-
+   
     _log_assessment(session, result, db)
 
     return schemas.AnalyzeResponse(
