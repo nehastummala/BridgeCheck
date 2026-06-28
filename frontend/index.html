@@ -993,6 +993,15 @@ function pickSteps() {
 }
 
 function runAnalyzingAnimation() {
+  const list = document.getElementById('check-list-dynamic');
+if (!list) return;
+
+list.innerHTML = steps.map((s, i) =>
+  `<div class="check-item" id="chk-${i}">
+    <div class="check-dot"><i class="ti ti-check"></i></div>
+    <span>${s.label || s.l}</span>
+  </div>`
+).join('');
   return new Promise(resolve => {
     const steps = pickSteps();
     const pcts  = [18, 38, 58, 78, 95];
