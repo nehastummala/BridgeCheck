@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="BridgeCheck — an adaptive mental health navigation platform that identifies barriers to care and matches you with resources that fit your situation."/>
+<title>BridgeCheck — Adaptive Mental Health Navigation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+/* ─── TOKENS ─────────────────────────────────────────────── */
+:root {
+  --indigo:       #3D35A8;
+  --indigo-light: #534AB7;
+  --indigo-dim:   #7F77DD;
+  --indigo-pale:  #EEEDFE;
+  --indigo-mid:   #AFA9EC;
+  --indigo-dark:  #26215C;
+  --indigo-deep:  #1A1640;
+
+  --surface:      #FFFFFF;
+  --surface-2:    #F7F7FB;
+  --surface-3:    #EFEFF7;
+  --border:       #E4E3F3;
+  --border-strong:#C8C5EC;
+
+  --text-primary: #111028;
+  --text-secondary:#4A4870;
+  --text-muted:   #8884B0;
+
+  --amber:        #F59E0B;
+  --amber-pale:   #FAEEDA;
+  --amber-border: #FAC775;
+  --amber-text:   #633806;
+
+  --green:        #22C55E;
+  --green-pale:   #EAF3DE;
+  --green-border: #C0DD97;
+  --green-text:   #27500A;
+
+  --red-pale:     #FCEBEB;
+  --red-border:   #F7C1C1;
+  --red-text:     #A32D2D;
+  --red-dark:     #791F1F;
+
+  --radius:       10px;
+  --radius-lg:    14px;
+  --font-display: 'Sora', sans-serif;
+  --font-body:    'Inter', sans-serif;
+  --max-w:        720px;
+}
+
+/* ─── RESET ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); font-size: 15px; background: var(--surface); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+button { font-family: var(--font-body); cursor: pointer; }
+img { max-width: 100%; }
+
+/* ─── PAGES ──────────────────────────────────────────────── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ─── GLOBAL NAV ─────────────────────────────────────────── */
+.site-nav {
+  position: sticky; top: 0; z-index: 40;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.9rem 1.5rem;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 0.5px solid var(--border);
+}
+.nav-logo { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.nav-logo-mark { width: 30px; height: 30px; border-radius: 8px; background: var(--indigo); display: flex; align-items: center; justify-content: center; }
+.nav-logo-mark i { color: #fff; font-size: 15px; }
+.nav-logo-text { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text-primary); }
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-link { font-size: 13px; color: var(--text-secondary); padding: 6px 10px; border-radius: 8px; transition: background 0.15s; }
+.nav-link:hover { background: var(--surface-2); }
+.nav-cta { padding: 7px 16px; background: var(--indigo); color: #fff; border: none; border-radius: 20px; font-size: 13px; font-weight: 500; transition: background 0.15s; }
+.nav-cta:hover { background: var(--indigo-dark); }
+.sos-btn-nav { display: flex; align-items: center; gap: 5px; padding: 6px 12px; background: var(--red-pale); border: 0.5px solid var(--red-border); border-radius: 20px; color: var(--red-text); font-size: 12px; font-weight: 500; }
+.sos-btn-nav:hover { background: var(--red-border); }
+
+/* ─── LANDING: HERO ──────────────────────────────────────── */
+.hero {
+  min-height: 88vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 4rem 1.5rem 3rem;
+  text-align: center;
+  background: linear-gradient(160deg, #F0EFFD 0%, #FFFFFF 55%, #F5F3FF 100%);
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: -120px; right: -180px;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(83,74,183,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--indigo-pale); border: 0.5px solid var(--indigo-mid);
+  border-radius: 20px; padding: 5px 14px;
+  font-size: 12px; font-weight: 500; color: var(--indigo-light);
+  margin-bottom: 1.5rem; letter-spacing: 0.3px;
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  color: var(--indigo-dark);
+  max-width: 680px;
+  margin: 0 auto 1.25rem;
+}
+.hero h1 em { font-style: normal; color: var(--indigo-light); }
+.hero-sub {
+  font-size: clamp(15px, 2vw, 17px);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 540px;
+  margin: 0 auto 2rem;
+}
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 3rem; }
+.btn-hero { padding: 0.85rem 2rem; background: var(--indigo); color: #fff; border: none; border-radius: 24px; font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: background 0.15s, transform 0.1s; }
+.btn-hero:hover { background: var(--indigo-dark); transform: translateY(-1px); }
+.btn-hero-ghost { padding: 0.85rem 1.75rem; background: transparent; color: var(--indigo-light); border: 1px solid var(--indigo-mid); border-radius: 24px; font-size: 15px; font-weight: 500; transition: background 0.15s; }
+.btn-hero-ghost:hover { background: var(--indigo-pale); }
+.hero-stats { display: flex; gap: 2.5rem; flex-wrap: wrap; justify-content: center; }
+.stat { text-align: center; }
+.stat-num { font-family: var(--font-display); font-size: 1.75rem; font-weight: 700; color: var(--indigo-dark); line-height: 1; }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ─── LANDING: HOW IT WORKS ─────────────────────────────── */
+.section { padding: 5rem 1.5rem; }
+.section-inner { max-width: var(--max-w); margin: 0 auto; }
+.section-eyebrow { font-size: 11px; font-weight: 600; color: var(--indigo-light); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: clamp(1.5rem, 3.5vw, 2rem); font-weight: 700; color: var(--indigo-dark); margin-bottom: 0.75rem; line-height: 1.25; }
+.section-body { font-size: 15px; color: var(--text-secondary); line-height: 1.7; max-width: 520px; }
+.section.alt { background: var(--surface-2); }
+
+.steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-top: 2.5rem; }
+.step-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.4rem; }
+.step-num { width: 36px; height: 36px; border-radius: 10px; background: var(--indigo); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 0.9rem; }
+.step-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+.step-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.55; }
+
+/* ─── LANDING: BRIDGELOGIC EXPLAINER ───────────────────── */
+.bl-explainer { background: var(--indigo-dark); border-radius: 20px; padding: 2.5rem; margin-top: 0; }
+.bl-explainer-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
+.bl-explainer-sub { font-size: 14px; color: var(--indigo-mid); line-height: 1.65; margin-bottom: 1.75rem; max-width: 500px; }
+.bl-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+.bl-feature { background: rgba(255,255,255,0.06); border: 0.5px solid rgba(175,169,236,0.25); border-radius: 11px; padding: 1rem; }
+.bl-feature-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(83,74,183,0.5); display: flex; align-items: center; justify-content: center; margin-bottom: 0.6rem; }
+.bl-feature-icon i { color: #CECBF6; font-size: 16px; }
+.bl-feature-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 3px; }
+.bl-feature-desc { font-size: 12px; color: var(--indigo-mid); line-height: 1.5; }
+
+/* ─── LANDING: FOUNDER ────────────────────────────────── */
+.founder-card { background: var(--indigo-pale); border: 0.5px solid var(--indigo-mid); border-radius: var(--radius-lg); padding: 2rem; display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap; }
+.founder-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--indigo); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.founder-avatar i { color: #fff; font-size: 26px; }
+.founder-body {}
+.founder-name { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--indigo-dark); margin-bottom: 2px; }
+.founder-role { font-size: 12px; color: var(--indigo-dim); margin-bottom: 0.75rem; }
+.founder-text { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+
+/* ─── LANDING: FOOTER ────────────────────────────────── */
+.site-footer { background: var(--indigo-deep); padding: 2.5rem 1.5rem; text-align: center; }
+.footer-logo { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 1rem; }
+.footer-logo-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--indigo-light); display: flex; align-items: center; justify-content: center; }
+.footer-logo-mark i { color: #fff; font-size: 14px; }
+.footer-logo-text { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: #fff; }
+.footer-links { display: flex; gap: 1.25rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.footer-link { font-size: 13px; color: var(--indigo-mid); }
+.footer-link:hover { color: #fff; }
+.footer-note { font-size: 12px; color: #4A4870; line-height: 1.6; max-width: 480px; margin: 0 auto; }
+.footer-divider { border: none; border-top: 0.5px solid rgba(83,74,183,0.3); margin: 1.25rem auto; max-width: 400px; }
+
+/* ─── APP SHELL ────────────────────────────────────────── */
+.app-shell { min-height: 100vh; }
+.app-wrap { max-width: var(--max-w); margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+/* ─── APP COMPONENTS ──────────────────────────────────── */
+.progress-bar { height: 3px; background: var(--border); border-radius: 2px; margin-bottom: 1.75rem; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--indigo); border-radius: 2px; transition: width 0.5s ease; }
+.step-label { font-size: 12px; color: var(--text-muted); margin-bottom: 0.4rem; }
+.app-wrap h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 0.4rem; line-height: 1.3; }
+.app-sub { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem; }
+
+.disclaimer-strip { display: flex; align-items: flex-start; gap: 8px; background: var(--amber-pale); border: 0.5px solid var(--amber-border); border-radius: 8px; padding: 10px 12px; margin-bottom: 1.25rem; font-size: 12px; color: var(--amber-text); line-height: 1.5; }
+.disclaimer-strip i { font-size: 14px; color: #854F0B; flex-shrink: 0; margin-top: 1px; }
+
+.options-grid { display: grid; gap: 8px; }
+.option-btn { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 11px; padding: 0.9rem 1.1rem; text-align: left; cursor: pointer; transition: border-color 0.15s, background 0.15s; display: flex; align-items: center; gap: 11px; width: 100%; }
+.option-btn:hover { border-color: var(--indigo-dim); background: var(--indigo-pale); }
+.option-btn.selected { border-color: var(--indigo); background: var(--indigo-pale); }
+.opt-icon { width: 34px; height: 34px; border-radius: 8px; background: var(--surface); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.opt-icon i { font-size: 17px; color: var(--text-secondary); }
+.option-btn.selected .opt-icon { background: var(--indigo); border-color: var(--indigo); }
+.option-btn.selected .opt-icon i { color: #fff; }
+.opt-label { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+.opt-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; line-height: 1.4; }
+.multi-note { font-size: 12px; color: var(--text-muted); margin-top: 0.6rem; }
+
+.nav-row { display: flex; gap: 9px; margin-top: 1.25rem; }
+.btn-primary { flex: 1; padding: 0.75rem 1.25rem; background: var(--indigo); color: #fff; border: none; border-radius: var(--radius); font-size: 14px; font-weight: 500; transition: background 0.15s; }
+.btn-primary:hover { background: var(--indigo-dark); }
+.btn-primary:disabled { background: var(--border); cursor: not-allowed; color: var(--text-muted); }
+.btn-back { padding: 0.75rem 1.1rem; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: var(--radius); font-size: 14px; color: var(--text-secondary); }
+.btn-back:hover { background: var(--surface-3); }
+
+.zip-row { display: flex; gap: 8px; margin-bottom: 0.75rem; }
+.zip-input { flex: 1; padding: 0.65rem 1rem; border: 0.5px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: var(--font-body); color: var(--text-primary); background: var(--surface-2); }
+.zip-input:focus { outline: none; border-color: var(--indigo); }
+.zip-btn { padding: 0.65rem 1rem; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); font-size: 13px; color: var(--text-secondary); }
+.zip-btn:hover { background: var(--surface-2); }
+.zip-tag { display: inline-flex; align-items: center; gap: 5px; background: var(--indigo-pale); border: 0.5px solid var(--indigo-mid); border-radius: 20px; padding: 3px 9px; font-size: 12px; color: var(--indigo-dark); }
+
+.adaptive-note { display: flex; align-items: center; gap: 7px; background: var(--indigo-pale); border: 0.5px solid var(--indigo-mid); border-radius: 8px; padding: 8px 12px; margin-bottom: 1.25rem; font-size: 12px; color: var(--indigo-dark); }
+.adaptive-note i { font-size: 14px; flex-shrink: 0; }
+
+.routing-banner { border-radius: 10px; padding: 12px 14px; margin-bottom: 1.25rem; display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.5; }
+.routing-banner.high { background: var(--green-pale); border: 0.5px solid var(--green-border); color: var(--green-text); }
+.routing-banner.low { background: var(--amber-pale); border: 0.5px solid var(--amber-border); color: var(--amber-text); }
+.routing-banner i { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.rb-title { font-weight: 500; margin-bottom: 2px; }
+
+/* Analyzing */
+.analyzing-wrap { padding: 3rem 0; text-align: center; }
+.engine-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--indigo-pale); border: 0.5px solid var(--indigo-mid); border-radius: 20px; padding: 5px 14px; font-size: 12px; font-weight: 500; color: var(--indigo-light); margin-bottom: 1rem; }
+.analyzing-title { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 0.35rem; }
+.analyzing-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 2rem; }
+.check-list { max-width: 300px; margin: 0 auto 2rem; }
+.check-item { display: flex; align-items: center; gap: 10px; padding: 0.6rem 0; border-bottom: 0.5px solid var(--border); font-size: 14px; color: var(--text-secondary); opacity: 0; transition: opacity 0.4s; text-align: left; }
+.check-item:last-child { border-bottom: none; }
+.check-item.visible { opacity: 1; } .check-item.done { color: var(--text-primary); }
+.check-dot { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s; }
+.check-item.done .check-dot { background: var(--indigo); border-color: var(--indigo); }
+.check-item.done .check-dot i { color: #fff; font-size: 11px; }
+.check-item.active .check-dot { border-color: var(--indigo); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { width: 14px; height: 14px; border: 1.5px solid var(--indigo-mid); border-top-color: var(--indigo); border-radius: 50%; animation: spin 0.7s linear infinite; }
+.meter-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin: 0 auto 0.5rem; max-width: 300px; }
+.meter-fill { height: 100%; background: var(--indigo); border-radius: 2px; transition: width 0.6s ease; width: 0%; }
+.meter-label { font-size: 12px; color: var(--text-muted); }
+
+/* Results */
+.section-label-sm { font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.7px; text-transform: uppercase; margin-bottom: 0.65rem; }
+.divider { border: none; border-top: 0.5px solid var(--border); margin: 1.25rem 0; }
+
+/* BridgeLogic Summary */
+.bl-summary-card { background: var(--indigo-dark); border-radius: 13px; padding: 1.25rem; margin-bottom: 1rem; }
+.bl-summary-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.bl-summary-hdr-title { font-size: 12px; font-weight: 500; color: var(--indigo-mid); letter-spacing: 0.5px; text-transform: uppercase; }
+.bl-route-badge { font-size: 11px; background: rgba(83,74,183,0.5); color: #CECBF6; padding: 3px 10px; border-radius: 20px; }
+.bl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+.bl-item-label { font-size: 11px; color: var(--indigo-dim); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
+.bl-item-value { font-size: 14px; font-weight: 500; color: #fff; }
+.bl-next { background: rgba(255,255,255,0.07); border-radius: 8px; padding: 10px 12px; }
+.bl-next-label { font-size: 11px; color: var(--indigo-dim); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
+.bl-next-value { font-size: 13px; color: #CECBF6; line-height: 1.55; }
+
+/* Confidence */
+.conf-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.1rem 1.25rem; margin-bottom: 1rem; display: flex; gap: 1.25rem; align-items: flex-start; }
+.score-ring { width: 72px; height: 72px; position: relative; flex-shrink: 0; }
+.score-ring svg { width: 72px; height: 72px; transform: rotate(-90deg); }
+.score-ring circle { fill: none; stroke-width: 5; }
+.ring-bg { stroke: var(--border); }
+.ring-fill { stroke: var(--indigo); stroke-linecap: round; stroke-dasharray: 188; stroke-dashoffset: 188; transition: stroke-dashoffset 1.2s ease; }
+.score-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 17px; font-weight: 600; color: var(--text-primary); }
+.score-lbl { font-size: 10px; color: var(--text-muted); text-align: center; margin-top: 4px; }
+.conf-detail h3 { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+.conf-note { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 6px; }
+.conf-reason { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+.conf-reason i { font-size: 13px; color: var(--indigo); }
+
+/* Barrier profile */
+.barrier-profile-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.1rem 1.25rem; margin-bottom: 1rem; }
+.barrier-row { margin-bottom: 10px; } .barrier-row:last-child { margin-bottom: 0; }
+.barrier-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.barrier-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+.barrier-pct { font-size: 12px; color: var(--text-muted); }
+.bar-track { height: 7px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--indigo); border-radius: 4px; width: 0%; transition: width 1s ease; }
+
+/* Why panel */
+.why-panel { background: var(--surface); border: 0.5px solid var(--border); border-radius: 11px; padding: 1rem 1.15rem; margin-bottom: 1rem; }
+.why-panel-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 7px; }
+.why-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 13px; color: var(--text-secondary); }
+.why-row:last-child { margin-bottom: 0; }
+.why-check { width: 18px; height: 18px; border-radius: 50%; background: var(--indigo-pale); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.why-check i { font-size: 11px; color: var(--indigo); }
+
+/* Resource cards */
+.resource-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 11px; padding: 1rem 1.15rem; margin-bottom: 9px; }
+.resource-card.top-match { border-color: var(--indigo); }
+.resource-header { display: flex; align-items: flex-start; gap: 7px; flex-wrap: wrap; margin-bottom: 5px; }
+.resource-name { font-size: 14px; font-weight: 600; color: var(--text-primary); flex: 1; min-width: 120px; }
+.badge { padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+.badge-free { background: var(--green-pale); color: var(--green-text); }
+.badge-low { background: var(--amber-pale); color: #854F0B; }
+.badge-top { background: var(--indigo-pale); color: var(--indigo-dark); }
+.resource-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 7px; }
+.why-box { background: var(--surface); border-radius: 7px; padding: 7px 10px; margin-bottom: 10px; font-size: 12px; color: var(--text-secondary); line-height: 1.5; border-left: 2px solid var(--indigo-mid); }
+.why-box strong { color: var(--indigo); font-weight: 500; }
+.resource-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 2px; }
+.res-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 0.5px solid var(--border); background: var(--surface); color: var(--indigo); text-decoration: none; transition: background 0.15s, border-color 0.15s; }
+.res-btn:hover { background: var(--indigo-pale); border-color: var(--indigo-mid); }
+.res-btn.primary { background: var(--indigo); color: #fff; border-color: var(--indigo); }
+.res-btn.primary:hover { background: var(--indigo-dark); }
+.res-btn i { font-size: 13px; }
+.chip { padding: 3px 9px; border-radius: 20px; font-size: 11px; border: 0.5px solid var(--border); color: var(--text-secondary); background: var(--surface); display: inline-flex; align-items: center; gap: 4px; }
+
+/* Action plan */
+.action-plan-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 11px; padding: 1.1rem; margin-bottom: 1rem; }
+.plan-step { display: flex; gap: 11px; margin-bottom: 0.9rem; } .plan-step:last-child { margin-bottom: 0; }
+.step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--indigo); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; margin-top: 1px; }
+.step-content h3 { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+.step-content p { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
+
+.share-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 1rem; }
+.share-btn { padding: 0.65rem; border: 0.5px solid var(--border); border-radius: var(--radius); background: var(--surface-2); font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; gap: 7px; }
+.share-btn:hover { border-color: var(--indigo); color: var(--indigo); }
+
+/* Sources */
+.sources-section { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 11px; padding: 1rem 1.15rem; margin-top: 1.5rem; }
+.sources-title { font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 0.6rem; }
+.source-item { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 3px; }
+.source-item a { color: var(--indigo); text-decoration: underline; text-underline-offset: 2px; }
+
+/* Privacy / Disclaimer page */
+.prose-page { max-width: 620px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+.prose-page h1 { font-family: var(--font-display); font-size: 1.75rem; font-weight: 700; color: var(--indigo-dark); margin-bottom: 0.4rem; }
+.prose-page .meta { font-size: 12px; color: var(--text-muted); margin-bottom: 2rem; }
+.prose-page h2 { font-family: var(--font-display); font-size: 1rem; font-weight: 600; color: var(--text-primary); margin: 1.75rem 0 0.4rem; }
+.prose-page p { font-size: 14px; color: var(--text-secondary); line-height: 1.75; margin-bottom: 0.75rem; }
+.prose-page ul { padding-left: 1.25rem; margin-bottom: 0.75rem; }
+.prose-page li { font-size: 14px; color: var(--text-secondary); line-height: 1.75; }
+.prose-page .highlight { background: var(--indigo-pale); border: 0.5px solid var(--indigo-mid); border-radius: 8px; padding: 1rem 1.1rem; margin-bottom: 1rem; font-size: 13px; color: var(--indigo-dark); line-height: 1.65; }
+
+/* ─── MODAL ─────────────────────────────────────────────── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+.modal-overlay.open { display: flex; }
+.modal-box { background: var(--surface); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 400px; width: 100%; border: 0.5px solid var(--border); }
+.modal-title { font-family: var(--font-display); font-size: 17px; font-weight: 600; color: var(--red-dark); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 8px; }
+.modal-body { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem; }
+.crisis-line { background: var(--red-pale); border: 0.5px solid var(--red-border); border-radius: 9px; padding: 0.75rem 1rem; margin-bottom: 7px; }
+.crisis-line a { display: block; }
+.crisis-name { font-size: 13px; font-weight: 600; color: var(--red-dark); margin-bottom: 2px; }
+.crisis-detail { font-size: 12px; color: var(--red-text); }
+.modal-close { width: 100%; padding: 0.65rem; border: 0.5px solid var(--border); border-radius: var(--radius); background: var(--surface-2); font-size: 14px; color: var(--text-secondary); margin-top: 0.5rem; }
+.modal-close:hover { background: var(--surface-3); }
+
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--indigo-dark); color: #fff; padding: 9px 18px; border-radius: var(--radius); font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 200; white-space: nowrap; }
+.toast.show { opacity: 1; }
+
+/* ─── RESPONSIVE ────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .site-nav { padding: 0.75rem 1rem; }
+  .nav-link { display: none; }
+  .hero { padding: 3rem 1.25rem 2.5rem; min-height: auto; }
+  .hero-stats { gap: 1.5rem; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .btn-hero, .btn-hero-ghost { justify-content: center; }
+  .bl-explainer { padding: 1.5rem; }
+  .bl-grid { grid-template-columns: 1fr; }
+  .steps-grid { grid-template-columns: 1fr; }
+  .share-row { grid-template-columns: 1fr; }
+  .conf-card { flex-direction: column; align-items: center; }
+  .founder-card { flex-direction: column; }
+}
+
+@media print {
+  .site-nav, .share-row, .btn-primary, .btn-back, .nav-row { display: none !important; }
+  .app-wrap { padding: 0; }
+  .resource-card, .bl-summary-card, .conf-card, .barrier-profile-card, .action-plan-card { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     GLOBAL NAV
+══════════════════════════════════════════════════════════ -->
+<nav class="site-nav" id="site-nav">
+  <div class="nav-logo" onclick="showPage('landing')">
+    <div class="nav-logo-mark"><i class="ti ti-brain"></i></div>
+    <span class="nav-logo-text">BridgeCheck</span>
+  </div>
+  <div class="nav-right">
+    <span class="nav-link" onclick="showPage('landing')" style="cursor:pointer">Home</span>
+    <span class="nav-link" onclick="showPage('privacy')" style="cursor:pointer">Privacy</span>
+    <span class="nav-link" onclick="showPage('disclaimer')" style="cursor:pointer">Disclaimer</span>
+    <button class="sos-btn-nav" onclick="openSOS()"><i class="ti ti-urgent"></i> Emergency</button>
+    <button class="nav-cta" onclick="startAssessment()">Start assessment</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE: LANDING
+══════════════════════════════════════════════════════════ -->
+<div id="page-landing" class="page active">
+
+  <section class="hero">
+    <div class="hero-eyebrow"><i class="ti ti-cpu" style="font-size:12px"></i> Powered by BridgeLogic™</div>
+    <h1>Mental health support<br/>that <em>adapts to you</em></h1>
+    <p class="hero-sub">BridgeCheck identifies the barriers preventing people from accessing mental health care and matches them with resources that fit their unique situation — not just their zip code.</p>
+    <div class="hero-actions">
+      <button class="btn-hero" onclick="startAssessment()"><i class="ti ti-arrow-right"></i> Start your free assessment</button>
+      <button class="btn-hero-ghost" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">How it works</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">14,000+</div><div class="stat-label">Facilities via SAMHSA</div></div>
+      <div class="stat"><div class="stat-num">6</div><div class="stat-label">Barrier dimensions</div></div>
+      <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Anonymous</div></div>
+      <div class="stat"><div class="stat-num">Free</div><div class="stat-label">Always</div></div>
+    </div>
+  </section>
+
+  <section class="section" id="how-it-works">
+    <div class="section-inner">
+      <div class="section-eyebrow">How it works</div>
+      <div class="section-title">Four questions. A personalized plan.</div>
+      <p class="section-body">BridgeLogic™ adapts in real time based on your answers — so the path every person takes is different.</p>
+      <div class="steps-grid">
+        <div class="step-card"><div class="step-num"><i class="ti ti-message-circle" style="font-size:16px;color:#fff"></i></div><div class="step-title">Tell us what you need</div><div class="step-desc">Choose the type of support you're looking for — therapy, crisis help, peer support, or more.</div></div>
+        <div class="step-card"><div class="step-num"><i class="ti ti-barrier-block" style="font-size:16px;color:#fff"></i></div><div class="step-title">Identify your barriers</div><div class="step-desc">Cost, transportation, language, privacy, wait times — BridgeLogic builds your barrier profile.</div></div>
+        <div class="step-card"><div class="step-num"><i class="ti ti-git-branch" style="font-size:16px;color:#fff"></i></div><div class="step-title">Adaptive follow-up</div><div class="step-desc">BridgeLogic adapts the next question to your biggest barrier — every user gets a different path.</div></div>
+        <div class="step-card"><div class="step-num"><i class="ti ti-sparkles" style="font-size:16px;color:#fff"></i></div><div class="step-title">Get your plan</div><div class="step-desc">Matched resources with confidence scoring, a barrier profile, and a clear action plan — all free.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt">
+    <div class="section-inner">
+      <div class="bl-explainer">
+        <div class="bl-explainer-title">Inside BridgeLogic™</div>
+        <div class="bl-explainer-sub">BridgeLogic is an Adaptive Barrier-Aware Decision Engine. It doesn't just ask fixed questions — it monitors confidence in real time and decides whether you need an additional question or whether your profile is already strong enough to generate accurate recommendations.</div>
+        <div class="bl-features">
+          <div class="bl-feature"><div class="bl-feature-icon"><i class="ti ti-git-branch"></i></div><div class="bl-feature-title">Adaptive questioning</div><div class="bl-feature-desc">Question 3 changes based on your primary barrier — six distinct paths.</div></div>
+          <div class="bl-feature"><div class="bl-feature-icon"><i class="ti ti-chart-bar"></i></div><div class="bl-feature-title">Barrier profiling</div><div class="bl-feature-desc">Each barrier is weighted by its impact on access to care, not just counted.</div></div>
+          <div class="bl-feature"><div class="bl-feature-icon"><i class="ti ti-shield-check"></i></div><div class="bl-feature-title">Confidence routing</div><div class="bl-feature-desc">High-confidence profiles skip unnecessary questions. Low-confidence ones get additional follow-up.</div></div>
+          <div class="bl-feature"><div class="bl-feature-icon"><i class="ti ti-lock"></i></div><div class="bl-feature-title">Privacy by design</div><div class="bl-feature-desc">This version collects no personal data. No names, emails, or IP-linked information. See our privacy policy for full details.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-eyebrow">About this project</div>
+      <div class="section-title">An independent research and technology project</div>
+      <div style="height:1rem"></div>
+      <div class="founder-card">
+        <div class="founder-avatar"><i class="ti ti-user"></i></div>
+        <div class="founder-body">
+          <div class="founder-name">BridgeCheck</div>
+          <div class="founder-role">Independent technology project · Community mental health access</div>
+          <div class="founder-text">BridgeCheck is an independent technology project focused on improving access to mental health resources through adaptive decision-support.<br/><br/>It was built to answer a simple question: why do so many people who need mental health support never find it? Not because resources don't exist — but because the barriers between people and care are invisible to the systems meant to help them. BridgeLogic™ was designed to make those barriers visible, and route around them.<br/><br/>All resources are verified against public databases and government sources. For feedback, questions, or collaboration inquiries, get in touch.</div>
+          <div style="margin-top:1.1rem;">
+            <a href="mailto:neha.s.tummala@gmail.com" class="res-btn primary" style="display:inline-flex;"><i class="ti ti-mail"></i> Contact the founder</a>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:2.5rem;">
+        <button class="btn-hero" onclick="startAssessment()"><i class="ti ti-arrow-right"></i> Start your free assessment</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-logo">
+      <div class="footer-logo-mark"><i class="ti ti-brain"></i></div>
+      <span class="footer-logo-text">BridgeCheck</span>
+    </div>
+    <div class="footer-links">
+      <span class="footer-link" onclick="showPage('landing')" style="cursor:pointer">Home</span>
+      <span class="footer-link" onclick="startAssessment()" style="cursor:pointer">Assessment</span>
+      <span class="footer-link" onclick="showPage('privacy')" style="cursor:pointer">Privacy policy</span>
+      <span class="footer-link" onclick="showPage('disclaimer')" style="cursor:pointer">Disclaimer</span>
+    </div>
+    <hr class="footer-divider"/>
+    <p class="footer-note">BridgeCheck is an informational tool and does not provide medical advice, diagnosis, or treatment. If you are experiencing a mental health emergency, call 988 or 911 immediately. © 2026 BridgeCheck. Built for educational and community use.</p>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE: APP
+══════════════════════════════════════════════════════════ -->
+<div id="page-app" class="page">
+  <div class="app-shell">
+    <div class="app-wrap">
+
+      <!-- WELCOME -->
+      <div id="screen-welcome" class="screen active">
+        <div style="background:var(--indigo-pale);border:0.5px solid var(--indigo-mid);border-radius:14px;padding:1.75rem;margin-bottom:1.5rem;">
+          <div style="font-size:11px;font-weight:600;color:var(--indigo-light);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:0.6rem;"><i class="ti ti-cpu" style="font-size:11px;vertical-align:-1px"></i> Powered by BridgeLogic™</div>
+          <div style="font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--indigo-dark);margin-bottom:0.5rem;line-height:1.3;">Mental health support that adapts to you</div>
+          <div style="font-size:14px;color:var(--indigo-light);line-height:1.65;margin-bottom:1rem;">BridgeCheck identifies the barriers preventing people from accessing mental health care and matches them with resources that fit their unique situation.</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <span style="display:inline-flex;align-items:center;gap:5px;background:#fff;border:0.5px solid var(--indigo-mid);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--indigo-light);"><i class="ti ti-git-branch" style="font-size:11px"></i>Adaptive questioning</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;background:#fff;border:0.5px solid var(--indigo-mid);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--indigo-light);"><i class="ti ti-chart-bar" style="font-size:11px"></i>Barrier profiling</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;background:#fff;border:0.5px solid var(--indigo-mid);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--indigo-light);"><i class="ti ti-shield-check" style="font-size:11px"></i>Confidence routing</span>
+          </div>
+        </div>
+        <div class="disclaimer-strip"><i class="ti ti-alert-triangle"></i><span>This tool is <strong>not a diagnosis</strong> and does not provide emergency care. If you are in crisis, tap <strong>Emergency</strong> in the navigation above or call <strong>988</strong> immediately.</span></div>
+        <button class="btn-primary" style="width:100%;padding:0.85rem;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:0.75rem;" onclick="goScreen('screen-q1')"><i class="ti ti-arrow-right"></i> Start your assessment</button>
+        <div style="text-align:center;font-size:12px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;gap:5px;"><i class="ti ti-lock"></i> Fully anonymous — nothing is saved or shared</div>
+      </div>
+
+      <!-- Q1 -->
+      <div id="screen-q1" class="screen" style="display:none">
+        <div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div>
+        <div class="step-label">Question 1 — What you need</div>
+        <h1>What kind of support are you looking for?</h1>
+        <p class="app-sub">BridgeLogic uses this to shape the questions that follow.</p>
+        <div class="options-grid">
+          <button class="option-btn" data-val="therapy" onclick="selectOption('q1',this)"><div class="opt-icon"><i class="ti ti-message-circle"></i></div><div><div class="opt-label">Talk therapy or counseling</div><div class="opt-desc">One-on-one support with a licensed therapist</div></div></button>
+          <button class="option-btn" data-val="crisis" onclick="selectOption('q1',this)"><div class="opt-icon"><i class="ti ti-flame"></i></div><div><div class="opt-label">I'm in a difficult moment right now</div><div class="opt-desc">Need to speak with someone soon or urgently</div></div></button>
+          <button class="option-btn" data-val="peer" onclick="selectOption('q1',this)"><div class="opt-icon"><i class="ti ti-users"></i></div><div><div class="opt-label">Peer support or community</div><div class="opt-desc">Groups, lived-experience mentors, mutual aid</div></div></button>
+          <button class="option-btn" data-val="substance" onclick="selectOption('q1',this)"><div class="opt-icon"><i class="ti ti-leaf"></i></div><div><div class="opt-label">Substance use or recovery</div><div class="opt-desc">Alcohol, drugs, or other dependencies</div></div></button>
+          <button class="option-btn" data-val="medication" onclick="selectOption('q1',this)"><div class="opt-icon"><i class="ti ti-pill"></i></div><div><div class="opt-label">Psychiatry or medication</div><div class="opt-desc">Finding a psychiatrist or managing prescriptions</div></div></button>
+        </div>
+        <div class="nav-row"><button class="btn-back" onclick="goScreen('screen-welcome')">Back</button><button class="btn-primary" id="q1-next" onclick="goScreen('screen-q2')" disabled>Continue</button></div>
+      </div>
+
+      <!-- Q2 -->
+      <div id="screen-q2" class="screen" style="display:none">
+        <div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
+        <div class="step-label">Question 2 — Barrier identification</div>
+        <h1>What's getting in the way?</h1>
+        <p class="app-sub">BridgeLogic uses your barrier profile to filter and rank resources. Select all that apply.</p>
+        <div class="options-grid">
+          <button class="option-btn" data-val="cost" onclick="selectMulti('q2',this)"><div class="opt-icon"><i class="ti ti-coin"></i></div><div><div class="opt-label">Cost or no insurance</div><div class="opt-desc">Can't afford sessions or medication</div></div></button>
+          <button class="option-btn" data-val="transport" onclick="selectMulti('q2',this)"><div class="opt-icon"><i class="ti ti-car"></i></div><div><div class="opt-label">No reliable transportation</div><div class="opt-desc">Hard to get to in-person appointments</div></div></button>
+          <button class="option-btn" data-val="language" onclick="selectMulti('q2',this)"><div class="opt-icon"><i class="ti ti-language"></i></div><div><div class="opt-label">Language or cultural barriers</div><div class="opt-desc">Need a provider who speaks my language</div></div></button>
+          <button class="option-btn" data-val="privacy" onclick="selectMulti('q2',this)"><div class="opt-icon"><i class="ti ti-shield"></i></div><div><div class="opt-label">Privacy or stigma concerns</div><div class="opt-desc">Worried about confidentiality or judgment</div></div></button>
+          <button class="option-btn" data-val="waittime" onclick="selectMulti('q2',this)"><div class="opt-icon"><i class="ti ti-clock"></i></div><div><div class="opt-label">Long wait times</div><div class="opt-desc">Can't get an appointment for weeks</div></div></button>
+          <button class="option-btn" data-val="info" onclick="selectMulti('q2',this)"><div class="opt-icon"><i class="ti ti-help-circle"></i></div><div><div class="opt-label">Don't know where to start</div><div class="opt-desc">Overwhelmed or unsure what I need</div></div></button>
+        </div>
+        <p class="multi-note">Select as many as apply</p>
+        <div id="q2-routing-preview" style="margin-top:1rem;display:none;"></div>
+        <div class="nav-row"><button class="btn-back" onclick="goScreen('screen-q1')">Back</button><button class="btn-primary" id="q2-next" onclick="routeAfterQ2()" disabled>Continue</button></div>
+      </div>
+
+      <!-- Q3 ADAPTIVE -->
+      <div id="screen-q3" class="screen" style="display:none">
+        <div class="progress-bar"><div class="progress-fill" style="width:65%"></div></div>
+        <div class="step-label">Question 3 — Adaptive follow-up</div>
+        <div class="adaptive-note"><i class="ti ti-cpu"></i><span>BridgeLogic adapted this question based on your barrier profile.</span></div>
+        <h1 id="q3-title"></h1>
+        <p class="app-sub" id="q3-subtitle"></p>
+        <div class="options-grid" id="q3-opts"></div>
+        <div class="nav-row"><button class="btn-back" onclick="goScreen('screen-q2')">Back</button><button class="btn-primary" id="q3-next" onclick="goScreen('screen-q4')" disabled>Continue</button></div>
+      </div>
+
+      <!-- Q4 -->
+      <div id="screen-q4" class="screen" style="display:none">
+        <div class="progress-bar"><div class="progress-fill" id="q4-progress" style="width:85%"></div></div>
+        <div class="step-label" id="q4-label">Question 4 — Access preferences</div>
+        <h1>How do you prefer to get support?</h1>
+        <p class="app-sub">We'll weight resources that match how you want to connect.</p>
+        <div class="options-grid">
+          <button class="option-btn" data-val="inperson" onclick="selectMulti('q4',this)"><div class="opt-icon"><i class="ti ti-map-pin"></i></div><div><div class="opt-label">In-person visits</div></div></button>
+          <button class="option-btn" data-val="video" onclick="selectMulti('q4',this)"><div class="opt-icon"><i class="ti ti-video"></i></div><div><div class="opt-label">Video / telehealth</div></div></button>
+          <button class="option-btn" data-val="phone" onclick="selectMulti('q4',this)"><div class="opt-icon"><i class="ti ti-phone"></i></div><div><div class="opt-label">Phone call</div></div></button>
+          <button class="option-btn" data-val="text" onclick="selectMulti('q4',this)"><div class="opt-icon"><i class="ti ti-message"></i></div><div><div class="opt-label">Text or chat</div></div></button>
+        </div>
+        <p class="multi-note">Select as many as you'd like</p>
+        <div style="margin-top:1.25rem;">
+          <div class="section-label-sm">Your location <span style="font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted);">(optional — for local results)</span></div>
+          <div class="zip-row">
+            <input class="zip-input" id="zip-input" type="text" placeholder="ZIP code (e.g. 85001)" maxlength="5" inputmode="numeric"/>
+            <button class="zip-btn" onclick="applyZip()"><i class="ti ti-check"></i> Confirm</button>
+          </div>
+          <div id="zip-confirmed" style="display:none;margin-bottom:0.5rem;"></div>
+        </div>
+        <div class="nav-row">
+          <button class="btn-back" id="q4-back" onclick="goScreen('screen-q3')">Back</button>
+          <button class="btn-primary" id="q4-next" onclick="runAnalysis()" disabled>Generate my recommendations</button>
+        </div>
+      </div>
+
+      <!-- ANALYZING -->
+      <div id="screen-analyzing" class="screen" style="display:none">
+        <div class="analyzing-wrap">
+          <div class="engine-badge"><i class="ti ti-cpu"></i> BridgeLogic™ Engine</div>
+          <div class="analyzing-title">Analyzing your responses…</div>
+          <div class="analyzing-sub">BridgeLogic is building your personalized plan</div>
+          <div class="check-list" id="check-list-dynamic"></div>
+          <div class="meter-bar"><div class="meter-fill" id="meter-fill"></div></div>
+          <div class="meter-label" id="meter-label" style="margin-top:0.5rem;">Initializing…</div>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div id="screen-results" class="screen" style="display:none">
+        <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+        <h1>Your personalized plan</h1>
+        <p class="app-sub" id="results-subtitle" style="margin-bottom:1rem;"></p>
+        <div class="disclaimer-strip" style="margin-bottom:1.25rem;"><i class="ti ti-alert-triangle"></i><span>For informational use only. BridgeCheck does not provide diagnosis, treatment, or emergency care. <span onclick="showPage('disclaimer')" style="color:var(--indigo);cursor:pointer;text-decoration:underline;text-underline-offset:2px;">Read full disclaimer →</span></span></div>
+
+        <div class="section-label-sm">BridgeLogic™ summary</div>
+        <div class="bl-summary-card" id="bl-summary"></div>
+
+        <div class="divider"></div>
+        <div class="section-label-sm">Match confidence</div>
+        <div class="conf-card">
+          <div>
+            <div class="score-ring"><svg viewBox="0 0 72 72"><circle class="ring-bg" cx="36" cy="36" r="30"/><circle class="ring-fill" id="ring-fill" cx="36" cy="36" r="30"/></svg><div class="score-num" id="score-num">0%</div></div>
+            <div class="score-lbl">Match<br>confidence</div>
+          </div>
+          <div class="conf-detail">
+            <h3>Recommendation confidence</h3>
+            <div class="conf-note">BridgeLogic calculates this based on the completeness and consistency of the information you provided — not a clinical assessment.</div>
+            <div id="conf-reasons"></div>
+          </div>
+        </div>
+
+        <div class="section-label-sm" style="margin-top:1rem;">Barrier profile</div>
+        <div class="barrier-profile-card" id="barrier-profile"></div>
+
+        <div class="divider"></div>
+        <div class="why-panel" id="why-panel">
+          <div class="why-panel-title"><i class="ti ti-cpu" style="font-size:14px;color:var(--indigo)"></i> Why BridgeLogic chose these resources</div>
+          <div id="why-rows"></div>
+        </div>
+
+        <div class="section-label-sm">Matched resources <span id="match-count" style="font-size:11px;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0;"></span></div>
+        <div id="resource-list"></div>
+
+        <div class="divider"></div>
+        <div class="section-label-sm">Action plan</div>
+        <div class="action-plan-card" id="action-plan"></div>
+
+        <!-- Sources -->
+        <div class="sources-section">
+          <div class="sources-title">Resources verified from</div>
+          <div class="source-item">· <a href="https://findtreatment.gov" target="_blank" rel="noopener">SAMHSA Treatment Locator</a> — Substance Abuse and Mental Health Services Administration</div>
+          <div class="source-item">· <a href="https://www.hrsa.gov/opa/eligibility-and-registration/health-centers/fqhc" target="_blank" rel="noopener">HRSA Federally Qualified Health Centers</a> — Health Resources & Services Administration</div>
+          <div class="source-item">· <a href="https://988lifeline.org" target="_blank" rel="noopener">988 Suicide & Crisis Lifeline</a> — SAMHSA / Vibrant Emotional Health</div>
+          <div class="source-item">· <a href="https://www.nami.org/help" target="_blank" rel="noopener">NAMI Helpline</a> — National Alliance on Mental Illness</div>
+          <div class="source-item">· <a href="https://openpathcollective.org" target="_blank" rel="noopener">Open Path Collective</a> — verified nonprofit sliding-scale network</div>
+          <div class="source-item">· <a href="https://www.smartrecovery.org" target="_blank" rel="noopener">SMART Recovery</a> — peer-reviewed addiction recovery program</div>
+          <div class="source-item" style="margin-top:6px;font-style:italic;color:var(--text-muted);">Resource information last reviewed June 2025. Always verify hours and eligibility directly with each provider.</div>
+        </div>
+
+        <div class="share-row">
+          <button class="share-btn" onclick="window.print()"><i class="ti ti-printer"></i> Print / save</button>
+          <button class="share-btn" onclick="copyLink()"><i class="ti ti-link"></i> Copy link</button>
+        </div>
+        <div style="margin-top:1rem;">
+          <button class="btn-primary" onclick="resetAll();goScreen('screen-welcome')">Start a new assessment</button>
+        </div>
+        <div style="text-align:center;margin-top:1rem;font-size:12px;color:var(--text-muted);">
+          <span onclick="showPage('privacy')" style="color:var(--indigo);cursor:pointer;">Privacy policy</span> · <span onclick="showPage('disclaimer')" style="color:var(--indigo);cursor:pointer;">Full disclaimer</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE: PRIVACY
+══════════════════════════════════════════════════════════ -->
+<div id="page-privacy" class="page">
+  <div class="prose-page">
+    <h1>Privacy Policy</h1>
+    <div class="meta">Last updated: June 2026 · BridgeCheck</div>
+    <div class="highlight">BridgeCheck is designed to be fully anonymous. We do not collect your name, email, location, IP address, or any mental health information you enter into the assessment.</div>
+    <h2>What we collect</h2>
+    <p>BridgeCheck collects nothing that identifies you. The assessment runs entirely in your browser. Your answers are never sent to a server, stored in a database, or linked to any account.</p>
+    <p>If anonymous aggregate analytics are ever enabled in a future version, only non-identifiable counts will be collected (e.g., "32 people selected 'cost' as a barrier this week"). No session IDs, IP addresses, or response sequences will be stored.</p>
+    <h2>Cookies and tracking</h2>
+    <p>BridgeCheck does not use cookies, tracking pixels, or any third-party analytics tools (such as Google Analytics). There are no ads, no ad networks, and no data brokers.</p>
+    <h2>Third-party resources</h2>
+    <p>BridgeCheck links to external resources (988 Lifeline, NAMI, Open Path Collective, SAMHSA, etc.). Once you leave BridgeCheck and visit those sites, their own privacy policies apply. We encourage you to review those policies independently.</p>
+    <h2>Children</h2>
+    <p>BridgeCheck is intended for users of all ages seeking mental health resource information. We do not knowingly collect any information from anyone.</p>
+    <h2>Changes to this policy</h2>
+    <p>If this policy ever changes, the updated date at the top of this page will reflect it. We will never introduce data collection that identifies users without clear disclosure.</p>
+    <h2>Contact</h2>
+    <p>Questions about this policy? Reach out through the project's contact information listed on the home page.</p>
+    <div style="margin-top:2rem;"><button class="btn-primary" style="display:inline-flex;align-items:center;gap:7px;" onclick="showPage('landing')"><i class="ti ti-arrow-left"></i> Back to home</button></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE: DISCLAIMER
+══════════════════════════════════════════════════════════ -->
+<div id="page-disclaimer" class="page">
+  <div class="prose-page">
+    <h1>Disclaimer</h1>
+    <div class="meta">Last updated: June 2026 · BridgeCheck</div>
+    <div class="highlight">BridgeCheck is an informational navigation tool. It is not a medical service, not a licensed clinical platform, and not a substitute for professional mental health care.</div>
+    <h2>Not a diagnosis</h2>
+    <p>BridgeCheck does not diagnose mental health conditions. The assessment questions are designed to identify access barriers, not to evaluate symptoms or clinical need. Nothing in this tool should be interpreted as a clinical assessment, screening, or recommendation to pursue or avoid any particular treatment.</p>
+    <h2>Not emergency care</h2>
+    <p>If you are in a mental health emergency — including thoughts of suicide or self-harm, or if you are in immediate danger — do not use this tool. Call or text <strong>988</strong> (Suicide & Crisis Lifeline), text HOME to <strong>741741</strong> (Crisis Text Line), or call <strong>911</strong>.</p>
+    <h2>Resource accuracy</h2>
+    <p>BridgeCheck links to publicly available mental health resources verified against government and nonprofit databases. We make reasonable efforts to keep this information current, but:</p>
+    <ul>
+      <li>Resource availability, eligibility, and fees can change.</li>
+      <li>Always confirm details directly with each provider before relying on them.</li>
+      <li>BridgeCheck is not affiliated with, endorsed by, or a referral partner of any listed resource.</li>
+    </ul>
+    <h2>No professional relationship</h2>
+    <p>Using BridgeCheck does not create a patient-provider relationship, a counselor-client relationship, or any professional relationship of any kind. BridgeCheck is an independent technology project, not a licensed healthcare or counseling service.</p>
+    <h2>Limitation of liability</h2>
+    <p>BridgeCheck and its creators are not liable for any decisions made based on information provided by this tool. Users should exercise independent judgment and consult qualified professionals for medical and mental health decisions.</p>
+    <h2>Intended use</h2>
+    <p>BridgeCheck is intended to help people discover publicly available mental health resources they may not have known about, by surfacing options that address their specific access barriers. It is designed for educational and community benefit.</p>
+    <div style="margin-top:2rem;"><button class="btn-primary" style="display:inline-flex;align-items:center;gap:7px;" onclick="showPage('landing')"><i class="ti ti-arrow-left"></i> Back to home</button></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     EMERGENCY MODAL
+══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="sos-modal">
+  <div class="modal-box">
+    <div class="modal-title"><i class="ti ti-urgent"></i> Emergency resources</div>
+    <div class="modal-body">If you are in immediate danger, call 911. The resources below are free, confidential, and available 24/7.</div>
+    <div class="crisis-line"><a href="tel:988"><div class="crisis-name">988 Suicide & Crisis Lifeline</div><div class="crisis-detail">Call or text <strong>988</strong> — 24/7, free, confidential</div></a></div>
+    <div class="crisis-line"><a href="sms:741741&body=HOME"><div class="crisis-name">Crisis Text Line</div><div class="crisis-detail">Text <strong>HOME</strong> to <strong>741741</strong></div></a></div>
+    <div class="crisis-line"><a href="tel:18006624357"><div class="crisis-name">SAMHSA National Helpline</div><div class="crisis-detail">Call <strong>1-800-662-4357</strong> — substance use & mental health</div></a></div>
+    <div class="crisis-line"><a href="tel:18664887386"><div class="crisis-name">Trevor Project (LGBTQ+ youth)</div><div class="crisis-detail">Call <strong>1-866-488-7386</strong> or text <strong>START</strong> to <strong>678-678</strong></div></a></div>
+    <button class="modal-close" onclick="closeSOS()">Close</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Link copied!</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════ -->
+<script>
+/* ── STATE ───────────────────────────────────────────── */
+const S = { q1:null, q2:[], q3:null, q4:[], zip:'', skippedQ3:false, confAtQ2:0 };
+
+/* ── DATA ────────────────────────────────────────────── */
+const BARRIER_WEIGHTS = { cost:90, transport:75, privacy:68, waittime:60, language:55, info:45 };
+const BARRIER_LABELS  = { cost:'Cost / no insurance', transport:'No transportation', language:'Language barrier', privacy:'Privacy / stigma', waittime:'Long wait times', info:'Unsure where to start' };
+const ACCESS_LABELS   = { inperson:'In-person', video:'Video', phone:'Phone', text:'Text/chat' };
+
+const ADAPTIVE_Q3 = {
+  cost:     { title:'Would free or low-cost options make getting help possible?', sub:'BridgeLogic detected cost as your primary barrier and will prioritize no-cost and sliding-scale resources.', opts:[{v:'yes_free',i:'ti-check',l:'Yes — free options would make a real difference',d:"I can't afford sessions right now"},{v:'yes_sliding',i:'ti-adjustments',l:'A sliding scale would work',d:'I can pay something, just not full price'},{v:'insurance',i:'ti-building-bank',l:"I have insurance but don't know what's covered",d:'Help me find in-network options'}] },
+  transport:{ title:'Would virtual appointments work better for you?', sub:'BridgeLogic detected transportation as your primary barrier and will prioritize telehealth and remote options.', opts:[{v:'yes_virtual',i:'ti-device-laptop',l:'Yes — I need fully virtual options',d:'Video, phone, or text from home'},{v:'nearby',i:'ti-map-pin',l:"I could do in-person if it's very close",d:'Within walking distance or a short ride'},{v:'mixed',i:'ti-arrows-left-right',l:'Either works depending on the day',d:'I want flexibility'}] },
+  privacy:  { title:'Would anonymous or low-profile support feel more comfortable?', sub:'BridgeLogic detected privacy concerns and will prioritize anonymous, no-registration resources.', opts:[{v:'anon',i:'ti-eye-off',l:'Yes — I want to stay anonymous',d:'No name, no records'},{v:'confidential',i:'ti-shield',l:"I'm okay with confidential (not anonymous)",d:'Private provider with HIPAA protections'},{v:'notsure',i:'ti-help-circle',l:"I'm not sure yet",d:'Show me all options'}] },
+  language: { title:'What language or cultural background matters most?', sub:'BridgeLogic will prioritize providers with multilingual staff and culturally informed approaches.', opts:[{v:'spanish',i:'ti-language',l:'Spanish-speaking provider',d:'Hablo español'},{v:'cultural',i:'ti-globe',l:'Culturally informed care',d:'A provider who understands my background'},{v:'other_lang',i:'ti-language',l:'Another language or preference',d:"I'll specify when I contact the provider"}] },
+  waittime: { title:'How quickly do you need to connect with someone?', sub:'BridgeLogic detected wait time as your primary barrier and will prioritize fast-access options.', opts:[{v:'today',i:'ti-urgent',l:'Today or tomorrow',d:'I need to talk to someone very soon'},{v:'this_week',i:'ti-calendar',l:'This week',d:'Within the next few days'},{v:'flexible',i:'ti-clock',l:"I'm flexible on timing",d:'I can wait if the provider is a great fit'}] },
+  info:     { title:'What feels like the best first step right now?', sub:"BridgeLogic detected you're still figuring out where to start and will surface navigator-friendly resources.", opts:[{v:'talk_someone',i:'ti-message-circle',l:'Talk to someone who can guide me',d:'A navigator or helpline I can call'},{v:'self_guide',i:'ti-list',l:"See a list of options I can review myself",d:"I'd rather research on my own first"},{v:'crisis_first',i:'ti-flame',l:'I think I need help urgently',d:'Point me toward immediate support'}] },
+  default:  { title:'How soon would you like to get started?', sub:'This helps BridgeLogic prioritize immediate vs. longer-term resources.', opts:[{v:'now',i:'ti-urgent',l:'As soon as possible',d:'I need something right away'},{v:'soon',i:'ti-calendar',l:'Within the next few weeks',d:"I'm ready but taking my time"},{v:'exploring',i:'ti-map',l:'Just exploring for now',d:'No rush'}] }
+};
+
+const RESOURCES = [
+  { id:'crisis988', name:'988 Suicide & Crisis Lifeline', desc:'Free, confidential crisis support 24/7 by call or text. Spanish line available. No insurance or ID needed.', badge:'free', tags:['crisis','peer'], barriers:['cost','privacy','info'], access:['phone','text'],
+    links:[{label:'Call 988',url:'tel:988',icon:'ti-phone',primary:true},{label:'Text 988',url:'sms:988',icon:'ti-message'},{label:'Visit site',url:'https://988lifeline.org',icon:'ti-external-link'}],
+    why:{ cost:'Completely free — no insurance, no ID required.', privacy:'Anonymous — counselors do not ask for your name.', info:'Can walk you through next steps and local resources while on the call.' } },
+  { id:'fqhc', name:'Community Mental Health Centers (FQHCs)', desc:'Federally-funded clinics offering therapy, psychiatry, and case management on a sliding-scale fee. 1,400+ locations nationally.', badge:'free', tags:['therapy','peer','medication','substance'], barriers:['cost','transport','language'], access:['inperson','phone'],
+    links:[{label:'Find a clinic',url:'https://findahealthcenter.hrsa.gov',icon:'ti-map-pin',primary:true},{label:'Call HRSA',url:'tel:18006218335',icon:'ti-phone'}],
+    why:{ cost:'Cannot turn away patients due to inability to pay — fees set to $0 for lowest-income clients.', language:'Most offer interpreter services and bilingual staff.', transport:'Many offer transportation assistance or telehealth.' } },
+  { id:'openpathcollective', name:'Open Path Collective', desc:'Sliding-scale therapy ($30–$80/session) with licensed therapists. Large telehealth network across the US.', badge:'low', tags:['therapy','medication'], barriers:['cost','waittime'], access:['video','inperson'],
+    links:[{label:'Find a therapist',url:'https://openpathcollective.org',icon:'ti-external-link',primary:true}],
+    why:{ cost:'Sessions well below market rate for people without insurance.', waittime:'Large network means faster match times than traditional providers.' } },
+  { id:'betterhelp', name:'BetterHelp Online Therapy', desc:'App-based therapy with licensed counselors. Financial aid available. Matches within 48 hours.', badge:'low', tags:['therapy'], barriers:['transport','waittime','privacy'], access:['video','phone','text'],
+    links:[{label:'Visit BetterHelp',url:'https://www.betterhelp.com',icon:'ti-external-link',primary:true}],
+    why:{ transport:'100% remote — access from your phone or computer.', waittime:'Typical match time under 48 hours vs. weeks for traditional therapy.', privacy:'Anonymous messaging option — your name is optional.' } },
+  { id:'nami', name:'NAMI Helpline & Peer Support', desc:'Free mental health information, peer support groups, and community education from the National Alliance on Mental Illness.', badge:'free', tags:['peer','therapy'], barriers:['cost','info','privacy'], access:['phone','text','video'],
+    links:[{label:'Call NAMI',url:'tel:18006264673',icon:'ti-phone',primary:true},{label:'Text NAMI',url:'sms:741741&body=NAMI',icon:'ti-message'},{label:'Visit site',url:'https://www.nami.org/help',icon:'ti-external-link'}],
+    why:{ cost:'Entirely free.', info:'Helpline staff help you figure out what support you need and where to find it.', privacy:'Non-judgmental and anonymous — no records kept.' } },
+  { id:'samhsa', name:'SAMHSA Treatment Locator', desc:'Search 14,000+ accredited treatment facilities by ZIP, insurance type, and service needed.', badge:'free', tags:['substance','medication','therapy'], barriers:['info','cost'], access:['inperson','phone'],
+    links:[{label:'Search by ZIP',url:'https://findtreatment.gov',icon:'ti-map-pin',primary:true},{label:'Call helpline',url:'tel:18006624357',icon:'ti-phone'}],
+    why:{ info:'Most comprehensive public directory of US treatment facilities.', cost:'Includes filters for sliding-scale and free programs.' } },
+  { id:'smartrecovery', name:'SMART Recovery', desc:'Free, science-based peer support groups for addiction and recovery — online meetings available every day.', badge:'free', tags:['substance','peer'], barriers:['cost','transport','privacy'], access:['video','phone','text'],
+    links:[{label:'Find a meeting',url:'https://www.smartrecovery.org/community/calendar.php',icon:'ti-calendar',primary:true},{label:'Visit site',url:'https://www.smartrecovery.org',icon:'ti-external-link'}],
+    why:{ cost:'All meetings are free — no dues, no 12-step requirement.', transport:'Online daily meetings, no commute.', privacy:'Participate anonymously with camera off.' } },
+  { id:'psych', name:'Psychology Today Therapist Finder', desc:'Search therapists by specialty, insurance, language, and sliding-scale availability. Includes telehealth filters.', badge:'low', tags:['therapy','medication'], barriers:['language','info','waittime'], access:['inperson','video','phone'],
+    links:[{label:'Find a therapist',url:'https://www.psychologytoday.com/us/therapists',icon:'ti-external-link',primary:true}],
+    why:{ language:'Filter by therapist language — 40+ languages listed.', info:'Detailed profiles explain each approach.', waittime:'Shows real-time availability calendars.' } }
+];
+
+/* ── PAGE ROUTING ─────────────────────────────────────── */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function startAssessment() {
+  showPage('app');
+  goScreen('screen-welcome');
+}
+
+/* ── APP SCREEN ROUTING ───────────────────────────────── */
+function goScreen(id) {
+  document.querySelectorAll('#page-app .screen').forEach(s => { s.style.display = 'none'; });
+  document.getElementById(id).style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+/* ── SELECTION ────────────────────────────────────────── */
+function selectOption(q, btn) {
+  btn.closest('.options-grid').querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  S[q] = btn.dataset.val;
+  const n = document.getElementById(q+'-next');
+  if(n) n.disabled = false;
+}
+function selectMulti(q, btn) {
+  btn.classList.toggle('selected');
+  const vals = Array.from(btn.closest('.options-grid').querySelectorAll('.option-btn.selected')).map(b=>b.dataset.val);
+  S[q] = vals;
+  const n = document.getElementById(q+'-next');
+  if(n) n.disabled = vals.length === 0;
+  if(q==='q2') updateRoutingPreview();
+}
+
+/* ── CONFIDENCE ───────────────────────────────────────── */
+function computeConf(partial) {
+  let c = 50;
+  if(S.q1) c += 10;
+  if(S.q2.length >= 1) c += 10;
+  if(S.q2.length >= 3) c += 8;
+  if(partial) return Math.min(c, 78);
+  if(S.q4.length >= 1) c += 10;
+  if(S.q4.length >= 2) c += 5;
+  if(S.zip) c += 5;
+  return Math.min(c, 97);
+}
+
+function updateRoutingPreview() {
+  const conf = computeConf(true);
+  S.confAtQ2 = conf;
+  const el = document.getElementById('q2-routing-preview');
+  if(S.q2.length === 0) { el.style.display='none'; return; }
+  el.style.display = 'block';
+  if(conf >= 75) {
+    el.innerHTML = `<div class="routing-banner high"><i class="ti ti-check-circle"></i><div><div class="rb-title">High confidence detected</div><div>BridgeLogic may skip the adaptive follow-up and proceed directly to access preferences.</div></div></div>`;
+  } else {
+    el.innerHTML = `<div class="routing-banner low"><i class="ti ti-cpu"></i><div><div class="rb-title">BridgeLogic needs one more question</div><div>An adaptive follow-up will sharpen your recommendations.</div></div></div>`;
+  }
+}
+
+function routeAfterQ2() {
+  const conf = S.confAtQ2 || computeConf(true);
+  if(conf >= 75) {
+    S.skippedQ3 = true; S.q3 = 'high_conf_skip';
+    document.getElementById('q4-label').textContent = 'Question 3 — Access preferences';
+    document.getElementById('q4-progress').style.width = '75%';
+    document.getElementById('q4-back').onclick = () => goScreen('screen-q2');
+    goScreen('screen-q4');
+  } else {
+    S.skippedQ3 = false;
+    const key = S.q2[0] || 'default';
+    const qd = ADAPTIVE_Q3[key] || ADAPTIVE_Q3.default;
+    document.getElementById('q3-title').textContent = qd.title;
+    document.getElementById('q3-subtitle').textContent = qd.sub;
+    const opts = document.getElementById('q3-opts');
+    opts.innerHTML = qd.opts.map(o=>`<button class="option-btn" data-val="${o.v}" onclick="selectOption('q3',this)"><div class="opt-icon"><i class="ti ${o.i}"></i></div><div><div class="opt-label">${o.l}</div><div class="opt-desc">${o.d}</div></div></button>`).join('');
+    S.q3 = null;
+    document.getElementById('q3-next').disabled = true;
+    goScreen('screen-q3');
+  }
+}
+
+/* ── ZIP ──────────────────────────────────────────────── */
+function applyZip() {
+  const z = document.getElementById('zip-input').value.trim();
+  if(z.length===5 && /^\d+$/.test(z)) {
+    S.zip = z;
+    const el = document.getElementById('zip-confirmed');
+    el.innerHTML = `<span class="zip-tag"><i class="ti ti-map-pin" style="font-size:12px"></i> Localized to ZIP ${z}</span>`;
+    el.style.display = 'block';
+  }
+}
+
+/* ── ANALYSIS ─────────────────────────────────────────── */
+function runAnalysis() {
+  goScreen('screen-analyzing');
+  const steps=[{d:200,l:'Reading barrier profile…'},{d:900,l:'Scoring access preferences…'},{d:1600,l:'Searching resource database…'},{d:2300,l:'Calculating match confidence…'},{d:3000,l:'Building personalized plan…'}];
+  const pcts=[18,38,58,78,95];
+  steps.forEach((s,i)=>{
+    setTimeout(()=>{
+      const el=document.getElementById('chk-'+i);
+      el.classList.add('visible','active');
+      if(i>0){const p=document.getElementById('chk-'+(i-1));p.classList.remove('active');p.classList.add('done');}
+      document.getElementById('meter-fill').style.width=pcts[i]+'%';
+      document.getElementById('meter-label').textContent=s.l;
+    },s.d);
+  });
+  setTimeout(()=>{document.getElementById('chk-4').classList.remove('active');document.getElementById('chk-4').classList.add('done');document.getElementById('meter-fill').style.width='100%';document.getElementById('meter-label').textContent='Complete';},3700);
+  setTimeout(()=>{buildResults();goScreen('screen-results');},4200);
+}
+
+/* ── RESULTS ──────────────────────────────────────────── */
+function buildResults() {
+  const {q1,q2,q4,zip,skippedQ3}=S;
+  const scored=RESOURCES.map(r=>{
+    let sc=0;const reasons=[];
+    if(r.tags.includes(q1)) sc+=4;
+    q2.forEach(b=>{if(r.barriers.includes(b)){sc+=3;reasons.push(b);}});
+    q4.forEach(a=>{if(r.access.includes(a)) sc+=2;});
+    return {...r,sc,reasons};
+  }).filter(r=>r.sc>0).sort((a,b)=>b.sc-a.sc).slice(0,4);
+
+  const conf=computeConf(false);
+  const confLabel=conf>=80?'High':conf>=65?'Medium':'Moderate';
+  const primary=q2[0]||'info';
+  const secondary=q2[1]||null;
+  const accessPref=q4.length?q4.map(a=>ACCESS_LABELS[a]).join(' / '):'Not specified';
+  const nextStep=q2.includes('cost')?'Ask about sliding-scale or free options when you first call any provider.':q2.includes('transport')?'Start with a telehealth option — BetterHelp or Open Path can match you within 48 hours.':q2.includes('privacy')?'Start with an anonymous option like the NAMI helpline or 988.':'Reach out to your top matched resource this week.';
+
+  document.getElementById('results-subtitle').textContent=`BridgeLogic analyzed your responses across ${q2.length+2} factors${skippedQ3?' — high confidence detected, adaptive follow-up skipped':''}.`;
+
+  document.getElementById('bl-summary').innerHTML=`
+    <div class="bl-summary-hdr"><div class="bl-summary-hdr-title"><i class="ti ti-cpu" style="font-size:10px;vertical-align:-1px"></i> BridgeLogic™ output</div><span class="bl-route-badge">${skippedQ3?'High-confidence route':'Standard route'}</span></div>
+    <div class="bl-grid">
+      <div><div class="bl-item-label">Primary barrier</div><div class="bl-item-value">${BARRIER_LABELS[primary]||'Not specified'}</div></div>
+      <div><div class="bl-item-label">Secondary barrier</div><div class="bl-item-value">${secondary?BARRIER_LABELS[secondary]:'None identified'}</div></div>
+      <div><div class="bl-item-label">Preferred access</div><div class="bl-item-value">${accessPref}</div></div>
+      <div><div class="bl-item-label">Match quality</div><div class="bl-item-value">${confLabel}</div></div>
+    </div>
+    <div class="bl-next"><div class="bl-next-label">Recommended next step</div><div class="bl-next-value">${nextStep}</div></div>`;
+
+  setTimeout(()=>{
+    const circ=document.getElementById('ring-fill');
+    const numEl=document.getElementById('score-num');
+    circ.style.strokeDashoffset=188-(188*(conf/100));
+    let cur=0;const t=setInterval(()=>{cur=Math.min(cur+2,conf);numEl.textContent=cur+'%';if(cur>=conf)clearInterval(t);},18);
+  },200);
+
+  const confReasons=[];
+  if(q2.length>=3) confReasons.push({i:'ti-check',t:`${q2.length} barriers identified`});
+  else if(q2.length>=1) confReasons.push({i:'ti-check',t:`${q2.length} barrier${q2.length>1?'s':''} identified`});
+  if(scored.length>=3) confReasons.push({i:'ti-check',t:`${scored.length} strong resource matches found`});
+  if(q4.length>=2) confReasons.push({i:'ti-check',t:'Access preferences well-specified'});
+  if(zip) confReasons.push({i:'ti-check',t:`Location context added (ZIP ${zip})`});
+  if(skippedQ3) confReasons.push({i:'ti-check',t:'High-confidence route — follow-up question not needed'});
+  document.getElementById('conf-reasons').innerHTML=confReasons.map(r=>`<div class="conf-reason"><i class="ti ${r.i}"></i><span>${r.t}</span></div>`).join('');
+
+  const pb=q2.length?q2:['info'];
+  const mw=Math.max(...pb.map(b=>BARRIER_WEIGHTS[b]||50));
+  document.getElementById('barrier-profile').innerHTML=pb.map(b=>{
+    const w=BARRIER_WEIGHTS[b]||50,pct=Math.round((w/mw)*100);
+    return `<div class="barrier-row"><div class="barrier-meta"><span class="barrier-name">${BARRIER_LABELS[b]||b}</span><span class="barrier-pct">${pct}% navigation priority</span></div><div class="bar-track"><div class="bar-fill" data-pct="${pct}"></div></div></div>`;
+  }).join('');
+  setTimeout(()=>document.querySelectorAll('.bar-fill').forEach(el=>el.style.width=el.dataset.pct+'%'),300);
+
+  const whyR=[];
+  if(q2.includes('cost')) whyR.push('remove financial barriers — all free or sliding-scale options shown');
+  if(q2.includes('transport')||q4.includes('video')||q4.includes('phone')) whyR.push('offer telehealth or remote access');
+  if(q2.includes('waittime')) whyR.push('have short or immediate wait times');
+  if(q2.includes('privacy')) whyR.push('provide confidential or anonymous support');
+  if(q2.includes('language')) whyR.push('offer multilingual or culturally informed services');
+  if(!whyR.length) whyR.push('match your stated support need','are publicly available and verified');
+  document.getElementById('why-rows').innerHTML=whyR.map(r=>`<div class="why-row"><div class="why-check"><i class="ti ti-check"></i></div><span>${r}</span></div>`).join('');
+
+  document.getElementById('match-count').textContent=`(${scored.length} matches)`;
+  document.getElementById('resource-list').innerHTML=scored.map((r,i)=>{
+    const wp=[];
+    r.reasons.forEach(b=>{if(r.why[b]) wp.push(r.why[b]);});
+    q4.forEach(a=>{if(r.access.includes(a)&&r.why[a]&&!wp.includes(r.why[a])) wp.push(r.why[a]);});
+    const whyText=wp.slice(0,2).join(' ');
+    const linksHtml=r.links.map(l=>`<a href="${l.url}" target="_blank" rel="noopener" class="res-btn${l.primary?' primary':''}"><i class="ti ${l.icon}"></i>${l.label}</a>`).join('');
+    const accessChips=r.access.map(a=>`<span class="chip"><i class="ti ti-${a==='video'?'video':a==='phone'?'phone':a==='text'?'message':'map-pin'}" style="font-size:11px"></i>${ACCESS_LABELS[a]}</span>`).join('');
+    return `<div class="resource-card${i===0?' top-match':''}">
+      <div class="resource-header">${i===0?'<span class="badge badge-top">Top match</span>':''}<span class="badge ${r.badge==='free'?'badge-free':'badge-low'}">${r.badge==='free'?'Free':'Low cost'}</span><span class="resource-name">${r.name}</span></div>
+      <div class="resource-desc">${r.desc}</div>
+      ${whyText?`<div class="why-box"><strong>Why this matches you:</strong> ${whyText}</div>`:''}
+      <div class="resource-actions">${linksHtml}</div>
+      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;">${accessChips}${zip&&r.barriers.includes('transport')?`<span class="chip"><i class="ti ti-map-pin" style="font-size:11px"></i>Near ${zip}</span>`:''}</div>
+    </div>`;
+  }).join('');
+
+  const steps=[];
+  if(q2.includes('cost')||q2.includes('transport')) steps.push({t:'Start with your top match today',b:scored[0]?`"${scored[0].name}" is your best fit. ${scored[0].badge==='free'?'It\'s free — no insurance needed.':'Financial aid is available — ask when you first reach out.'}`:'Reach out to the top resource listed above.'});
+  else steps.push({t:`Reach out to "${scored[0]?.name||'your top match'}"`,b:'This is your top BridgeLogic match. Contacting them this week gives you the best chance of a timely connection.'});
+  if(q2.includes('cost')) steps.push({t:'Ask about free or sliding-scale fees',b:`Say "I don't have insurance — do you offer sliding-scale or free options?" when you call. Most resources listed here do.`});
+  if(q2.includes('transport')||q4.includes('video')) steps.push({t:'Request a telehealth appointment',b:'All starred resources offer remote options. You can often start within 48 hours without leaving home.'});
+  if(q2.includes('language')) steps.push({t:'Request language support upfront',b:'All listed resources offer interpreter services or bilingual staff. Ask when you first contact them.'});
+  if(zip) steps.push({t:`Search locally near ZIP ${zip}`,b:'Visit findtreatment.gov to find accredited providers in your area that accept your insurance or offer free care.'});
+  steps.push({t:'Save or share this plan',b:'Print this page or copy the link. Consider sharing it with a trusted person in your life.'});
+  document.getElementById('action-plan').innerHTML=steps.map((s,i)=>`<div class="plan-step"><div class="step-num">${i+1}</div><div class="step-content"><h3>${s.t}</h3><p>${s.b}</p></div></div>`).join('');
+}
+
+/* ── UTILS ────────────────────────────────────────────── */
+function openSOS(){document.getElementById('sos-modal').classList.add('open');}
+function closeSOS(){document.getElementById('sos-modal').classList.remove('open');}
+document.getElementById('sos-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeSOS();});
+
+function resetAll(){
+  S.q1=null;S.q2=[];S.q3=null;S.q4=[];S.zip='';S.skippedQ3=false;S.confAtQ2=0;
+  document.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('selected'));
+  ['q1-next','q2-next','q3-next','q4-next'].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=true;});
+  const zc=document.getElementById('zip-confirmed');if(zc)zc.style.display='none';
+  const zi=document.getElementById('zip-input');if(zi)zi.value='';
+  const rp=document.getElementById('q2-routing-preview');if(rp)rp.style.display='none';
+  document.querySelectorAll('.check-item').forEach(el=>el.classList.remove('visible','active','done'));
+  const mf=document.getElementById('meter-fill');if(mf)mf.style.width='0%';
+  const rf=document.getElementById('ring-fill');if(rf)rf.style.strokeDashoffset='188';
+  const sn=document.getElementById('score-num');if(sn)sn.textContent='0%';
+}
+
+function copyLink(){
+  const url=window.location.href.split('#')[0];
+  navigator.clipboard.writeText(url).then(()=>{
+    const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);
+  }).catch(()=>{
+    const t=document.getElementById('toast');t.textContent='Copy: '+url;t.classList.add('show');setTimeout(()=>{t.classList.remove('show');t.textContent='Link copied!';},3000);
+  });
+}
+
+/* ── HANDLE SCREEN VISIBILITY ────────────────────────── */
+// On app page, only welcome is shown initially; goScreen manages the rest
+document.addEventListener('DOMContentLoaded', () => {
+  const screens = document.querySelectorAll('#page-app .screen');
+  screens.forEach((s,i) => { s.style.display = i===0 ? 'block' : 'none'; });
+});
+</script>
+</body>
+</html>
