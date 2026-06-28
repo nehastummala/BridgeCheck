@@ -456,7 +456,7 @@ img { max-width: 100%; }
   <section class="section">
     <div class="section-inner">
       <div class="section-eyebrow">About this project</div>
-      <div class="section-title">An independent technology project</div>
+      <div class="section-title">An independent research and technology project</div>
       <div style="height:1rem"></div>
       <div class="founder-card">
         <div class="founder-avatar"><i class="ti ti-user"></i></div>
@@ -649,7 +649,7 @@ img { max-width: 100%; }
           <div class="source-item">· <a href="https://www.nami.org/help" target="_blank" rel="noopener">NAMI Helpline</a> — National Alliance on Mental Illness</div>
           <div class="source-item">· <a href="https://openpathcollective.org" target="_blank" rel="noopener">Open Path Collective</a> — verified nonprofit sliding-scale network</div>
           <div class="source-item">· <a href="https://www.smartrecovery.org" target="_blank" rel="noopener">SMART Recovery</a> — peer-reviewed addiction recovery program</div>
-          <div class="source-item" style="margin-top:6px;font-style:italic;color:var(--text-muted);">Resource information last reviewed June 2026. Always verify hours and eligibility directly with each provider.</div>
+          <div class="source-item" style="margin-top:6px;font-style:italic;color:var(--text-muted);">Resource information last reviewed June 2025. Always verify hours and eligibility directly with each provider.</div>
         </div>
 
         <div class="share-row">
@@ -882,26 +882,245 @@ function applyZip() {
   }
 }
 
-/* ── ANALYSIS ─────────────────────────────────────────── */
-function runAnalysis() {
-  goScreen('screen-analyzing');
-  const steps=[{d:200,l:'Reading barrier profile…'},{d:900,l:'Scoring access preferences…'},{d:1600,l:'Searching resource database…'},{d:2300,l:'Calculating match confidence…'},{d:3000,l:'Building personalized plan…'}];
-  const pcts=[18,38,58,78,95];
-  steps.forEach((s,i)=>{
-    setTimeout(()=>{
-      const el=document.getElementById('chk-'+i);
-      el.classList.add('visible','active');
-      if(i>0){const p=document.getElementById('chk-'+(i-1));p.classList.remove('active');p.classList.add('done');}
-      document.getElementById('meter-fill').style.width=pcts[i]+'%';
-      document.getElementById('meter-label').textContent=s.l;
-    },s.d);
+/* ── API CONFIG ───────────────────────────────────────────
+   PHASE 1 (now): backend runs locally on your machine.
+   PHASE 2 (deploy): swap API_BASE to your Railway/Render URL.
+
+   Steps to go live:
+     1. Deploy backend to Railway (railway.app) or Render
+     2. Copy the URL they give you (e.g. https://bridgecheck-api.railway.app)
+     3. Replace the localhost line below with that URL
+     4. Re-deploy this file to Vercel
+
+   When USE_API is false (backend unreachable), the app
+   falls back to local BridgeLogic automatically — the
+   Vercel site keeps working even before backend is live.
+────────────────────────────────────────────────────────── */
+const API_BASE = "http://localhost:8000";   // ← swap this when you deploy backend
+// const API_BASE = "https://bridgecheck-api.railway.app";  // ← uncomment for prod
+let USE_API = true;   // flipped to false automatically if backend is unreachable
+
+async function apiPost(path, body) {
+  const res = await fetch(API_BASE + path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(8000),   // 8 s timeout
   });
-  setTimeout(()=>{document.getElementById('chk-4').classList.remove('active');document.getElementById('chk-4').classList.add('done');document.getElementById('meter-fill').style.width='100%';document.getElementById('meter-label').textContent='Complete';},3700);
-  setTimeout(()=>{buildResults();goScreen('screen-results');},4200);
+  if (!res.ok) throw new Error(`API ${res.status}`);
+  return res.json();
 }
 
-/* ── RESULTS ──────────────────────────────────────────── */
-function buildResults() {
+/* ── ROUTING (Q2 → Q3 or skip to Q4) ────────────────── */
+async function updateRoutingPreview() {
+  const el = document.getElementById('q2-routing-preview');
+  if (S.q2.length === 0) { el.style.display = 'none'; return; }
+
+  let skip = false;
+  let conf = computeConf(true);   // local fallback value
+
+  if (USE_API) {
+    try {
+      const data = await apiPost('/api/routing', { barriers: S.q2 });
+      skip = data.skip_q3;
+      conf = data.confidence;
+    } catch {
+      USE_API = false;   // backend unavailable — switch to local mode silently
+    }
+  } else {
+    skip = conf >= 75;
+  }
+
+  S.confAtQ2 = conf;
+  el.style.display = 'block';
+  el.innerHTML = skip
+    ? `<div class="routing-banner high"><i class="ti ti-check-circle"></i><div><div class="rb-title">High confidence detected</div><div>BridgeLogic may skip the adaptive follow-up and proceed directly to access preferences.</div></div></div>`
+    : `<div class="routing-banner low"><i class="ti ti-cpu"></i><div><div class="rb-title">BridgeLogic needs one more question</div><div>An adaptive follow-up will sharpen your recommendations.</div></div></div>`;
+}
+
+/* ── ADAPTIVE Q3 LOADER ──────────────────────────────── */
+async function routeAfterQ2() {
+  let skip = (S.confAtQ2 || computeConf(true)) >= 75;
+  let qData = null;
+
+  if (USE_API) {
+    try {
+      const data = await apiPost('/api/adaptive-question', { barriers: S.q2 });
+      skip  = data.skip_q3;
+      qData = data;   // { title, subtitle, options }
+    } catch {
+      USE_API = false;
+    }
+  }
+
+  if (skip) {
+    S.skippedQ3 = true; S.q3 = 'high_conf_skip';
+    document.getElementById('q4-label').textContent = 'Question 3 — Access preferences';
+    document.getElementById('q4-progress').style.width = '75%';
+    document.getElementById('q4-back').onclick = () => goScreen('screen-q2');
+    goScreen('screen-q4');
+  } else {
+    S.skippedQ3 = false;
+    // Use API data if available, otherwise fall back to local ADAPTIVE_Q3 map
+    if (!qData) {
+      const key = S.q2[0] || 'default';
+      const local = ADAPTIVE_Q3[key] || ADAPTIVE_Q3.default;
+      qData = { title: local.title, subtitle: local.sub, options: local.opts.map(o=>({value:o.v,label:o.l,desc:o.d,icon:o.i})) };
+    }
+    document.getElementById('q3-title').textContent = qData.title;
+    document.getElementById('q3-subtitle').textContent = qData.subtitle;
+    document.getElementById('q3-opts').innerHTML = qData.options.map(o => {
+      const icon = o.icon || o.i || 'ti-circle';
+      return `<button class="option-btn" data-val="${o.value||o.v}" onclick="selectOption('q3',this)"><div class="opt-icon"><i class="ti ${icon}"></i></div><div><div class="opt-label">${o.label||o.l}</div><div class="opt-desc">${o.desc||o.d}</div></div></button>`;
+    }).join('');
+    S.q3 = null;
+    document.getElementById('q3-next').disabled = true;
+    goScreen('screen-q3');
+  }
+}
+
+/* ── ANALYZING ANIMATION ─────────────────────────────── */
+const STEP_POOLS = [
+  ['Reading barrier profile…',   'Mapping access barriers…',    'Parsing barrier signals…'],
+  ['Scoring access preferences…','Weighting access modes…',     'Evaluating access profile…'],
+  ['Searching resource database…','Comparing local providers…',  'Scanning resource database…'],
+  ['Calculating match confidence…','Running confidence model…',  'Scoring recommendation fit…'],
+  ['Building personalized plan…', 'Finalizing action plan…',    'Prioritizing recommendations…'],
+];
+
+function pickSteps() {
+  return STEP_POOLS.map(pool => pool[Math.floor(Math.random() * pool.length)]);
+}
+
+function runAnalyzingAnimation() {
+  return new Promise(resolve => {
+    const steps = pickSteps();
+    const pcts  = [18, 38, 58, 78, 95];
+    steps.forEach((label, i) => {
+      setTimeout(() => {
+        const el = document.getElementById('chk-' + i);
+        el.querySelector('span').textContent = label;
+        el.classList.add('visible', 'active');
+        if (i > 0) {
+          const prev = document.getElementById('chk-' + (i - 1));
+          prev.classList.remove('active'); prev.classList.add('done');
+        }
+        document.getElementById('meter-fill').style.width = pcts[i] + '%';
+        document.getElementById('meter-label').textContent = label;
+      }, i * 700);
+    });
+    setTimeout(() => {
+      document.getElementById('chk-4').classList.remove('active');
+      document.getElementById('chk-4').classList.add('done');
+      document.getElementById('meter-fill').style.width = '100%';
+      document.getElementById('meter-label').textContent = 'Complete';
+      resolve();
+    }, steps.length * 700 + 300);
+  });
+}
+
+/* ── MAIN ANALYSIS ENTRY POINT ───────────────────────── */
+async function runAnalysis() {
+  goScreen('screen-analyzing');
+
+  const animationDone = runAnalyzingAnimation();   // run in parallel with API call
+
+  const payload = {
+    support_type:    S.q1,
+    barriers:        S.q2,
+    adaptive_answer: S.skippedQ3 ? null : S.q3,
+    access_prefs:    S.q4,
+    zip_code:        S.zip || null,
+  };
+
+  let data = null;
+
+  if (USE_API) {
+    try {
+      data = await apiPost('/api/analyze', payload);
+    } catch {
+      USE_API = false;
+      console.warn('Backend unavailable — using local BridgeLogic fallback.');
+    }
+  }
+
+  // Always wait for animation to finish before showing results
+  await animationDone;
+
+  if (data) {
+    renderResults(data);       // API path
+  } else {
+    renderResultsLocal();      // offline fallback
+  }
+  goScreen('screen-results');
+}
+
+/* ── RENDER FROM API RESPONSE ────────────────────────── */
+function renderResults(data) {
+  const { confidence, summary, barrier_profile, why_reasons, resources, action_plan, factors_analyzed, zip_code } = data;
+
+  document.getElementById('results-subtitle').textContent =
+    `BridgeLogic analyzed your responses across ${factors_analyzed} factors${confidence.skipped_q3 ? ' — high confidence detected, adaptive follow-up skipped' : ''}.`;
+
+  // BridgeLogic summary card
+  document.getElementById('bl-summary').innerHTML = `
+    <div class="bl-summary-hdr">
+      <div class="bl-summary-hdr-title"><i class="ti ti-cpu" style="font-size:10px;vertical-align:-1px"></i> BridgeLogic™ output</div>
+      <span class="bl-route-badge">${summary.route}</span>
+    </div>
+    <div class="bl-grid">
+      <div><div class="bl-item-label">Primary barrier</div><div class="bl-item-value">${summary.primary_barrier}</div></div>
+      <div><div class="bl-item-label">Secondary barrier</div><div class="bl-item-value">${summary.secondary_barrier}</div></div>
+      <div><div class="bl-item-label">Preferred access</div><div class="bl-item-value">${summary.preferred_access}</div></div>
+      <div><div class="bl-item-label">Match quality</div><div class="bl-item-value">${summary.match_quality}</div></div>
+    </div>
+    <div class="bl-next"><div class="bl-next-label">Recommended next step</div><div class="bl-next-value">${summary.next_step}</div></div>`;
+
+  // Confidence ring
+  animateRing(confidence.score);
+  document.getElementById('conf-reasons').innerHTML = confidence.reasons
+    .map(r => `<div class="conf-reason"><i class="ti ti-check"></i><span>${r.text}</span></div>`).join('');
+
+  // Barrier profile bars
+  document.getElementById('barrier-profile').innerHTML = barrier_profile.map(b =>
+    `<div class="barrier-row"><div class="barrier-meta"><span class="barrier-name">${b.label}</span><span class="barrier-pct">${b.priority}% navigation priority</span></div><div class="bar-track"><div class="bar-fill" data-pct="${b.priority}"></div></div></div>`
+  ).join('');
+  setTimeout(() => document.querySelectorAll('.bar-fill').forEach(el => el.style.width = el.dataset.pct + '%'), 300);
+
+  // Why panel
+  document.getElementById('why-rows').innerHTML = why_reasons
+    .map(r => `<div class="why-row"><div class="why-check"><i class="ti ti-check"></i></div><span>${r}</span></div>`).join('');
+
+  // Resource cards
+  document.getElementById('match-count').textContent = `(${resources.length} matches)`;
+  document.getElementById('resource-list').innerHTML = resources.map((r, i) => {
+    const linksHtml = (r.links || []).map(l =>
+      `<a href="${l.url}" target="_blank" rel="noopener" class="res-btn${l.primary ? ' primary' : ''}"><i class="ti ${l.icon}"></i>${l.label}</a>`
+    ).join('');
+    const accessChips = (r.access_modes || []).map(a =>
+      `<span class="chip"><i class="ti ti-${a==='video'?'video':a==='phone'?'phone':a==='text'?'message':'map-pin'}" style="font-size:11px"></i>${ACCESS_LABELS[a]||a}</span>`
+    ).join('');
+    return `<div class="resource-card${r.is_top_match ? ' top-match' : ''}">
+      <div class="resource-header">
+        ${r.is_top_match ? '<span class="badge badge-top">Top match</span>' : ''}
+        <span class="badge ${r.cost_badge==='free'?'badge-free':'badge-low'}">${r.cost_badge==='free'?'Free':'Low cost'}</span>
+        <span class="resource-name">${r.name}</span>
+      </div>
+      <div class="resource-desc">${r.description}</div>
+      ${r.why_text ? `<div class="why-box"><strong>Why this matches you:</strong> ${r.why_text}</div>` : ''}
+      <div class="resource-actions">${linksHtml}</div>
+      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;">${accessChips}${zip_code&&r.matched_barriers.includes('transport')?`<span class="chip"><i class="ti ti-map-pin" style="font-size:11px"></i>Near ${zip_code}</span>`:''}</div>
+    </div>`;
+  }).join('');
+
+  // Action plan
+  document.getElementById('action-plan').innerHTML = action_plan.map((s, i) =>
+    `<div class="plan-step"><div class="step-num">${i+1}</div><div class="step-content"><h3>${s.title}</h3><p>${s.body}</p></div></div>`
+  ).join('');
+}
+
+/* ── OFFLINE FALLBACK (same logic as before, renamed) ── */
+function renderResultsLocal() {
   const {q1,q2,q4,zip,skippedQ3}=S;
   const scored=RESOURCES.map(r=>{
     let sc=0;const reasons=[];
@@ -913,13 +1132,11 @@ function buildResults() {
 
   const conf=computeConf(false);
   const confLabel=conf>=80?'High':conf>=65?'Medium':'Moderate';
-  const primary=q2[0]||'info';
-  const secondary=q2[1]||null;
+  const primary=q2[0]||'info'; const secondary=q2[1]||null;
   const accessPref=q4.length?q4.map(a=>ACCESS_LABELS[a]).join(' / '):'Not specified';
-  const nextStep=q2.includes('cost')?'Ask about sliding-scale or free options when you first call any provider.':q2.includes('transport')?'Start with a telehealth option — BetterHelp or Open Path can match you within 48 hours.':q2.includes('privacy')?'Start with an anonymous option like the NAMI helpline or 988.':'Reach out to your top matched resource this week.';
+  const nextStep=q2.includes('cost')?'Ask about sliding-scale or free options when you first call any provider.':q2.includes('transport')?'Start with a telehealth option — most matched resources offer same-week remote availability.':q2.includes('privacy')?'Start with an anonymous option like the NAMI helpline or 988.':'Reach out to your top matched resource this week.';
 
   document.getElementById('results-subtitle').textContent=`BridgeLogic analyzed your responses across ${q2.length+2} factors${skippedQ3?' — high confidence detected, adaptive follow-up skipped':''}.`;
-
   document.getElementById('bl-summary').innerHTML=`
     <div class="bl-summary-hdr"><div class="bl-summary-hdr-title"><i class="ti ti-cpu" style="font-size:10px;vertical-align:-1px"></i> BridgeLogic™ output</div><span class="bl-route-badge">${skippedQ3?'High-confidence route':'Standard route'}</span></div>
     <div class="bl-grid">
@@ -930,28 +1147,17 @@ function buildResults() {
     </div>
     <div class="bl-next"><div class="bl-next-label">Recommended next step</div><div class="bl-next-value">${nextStep}</div></div>`;
 
-  setTimeout(()=>{
-    const circ=document.getElementById('ring-fill');
-    const numEl=document.getElementById('score-num');
-    circ.style.strokeDashoffset=188-(188*(conf/100));
-    let cur=0;const t=setInterval(()=>{cur=Math.min(cur+2,conf);numEl.textContent=cur+'%';if(cur>=conf)clearInterval(t);},18);
-  },200);
+  animateRing(conf);
+  const confR=[];
+  if(q2.length>=1) confR.push(`${q2.length} barrier${q2.length>1?'s':''} identified`);
+  if(scored.length>=3) confR.push(`${scored.length} strong resource matches found`);
+  if(q4.length>=2) confR.push('Access preferences well-specified');
+  if(zip) confR.push(`Location context added (ZIP ${zip})`);
+  if(skippedQ3) confR.push('High-confidence route — follow-up question not needed');
+  document.getElementById('conf-reasons').innerHTML=confR.map(t=>`<div class="conf-reason"><i class="ti ti-check"></i><span>${t}</span></div>`).join('');
 
-  const confReasons=[];
-  if(q2.length>=3) confReasons.push({i:'ti-check',t:`${q2.length} barriers identified`});
-  else if(q2.length>=1) confReasons.push({i:'ti-check',t:`${q2.length} barrier${q2.length>1?'s':''} identified`});
-  if(scored.length>=3) confReasons.push({i:'ti-check',t:`${scored.length} strong resource matches found`});
-  if(q4.length>=2) confReasons.push({i:'ti-check',t:'Access preferences well-specified'});
-  if(zip) confReasons.push({i:'ti-check',t:`Location context added (ZIP ${zip})`});
-  if(skippedQ3) confReasons.push({i:'ti-check',t:'High-confidence route — follow-up question not needed'});
-  document.getElementById('conf-reasons').innerHTML=confReasons.map(r=>`<div class="conf-reason"><i class="ti ${r.i}"></i><span>${r.t}</span></div>`).join('');
-
-  const pb=q2.length?q2:['info'];
-  const mw=Math.max(...pb.map(b=>BARRIER_WEIGHTS[b]||50));
-  document.getElementById('barrier-profile').innerHTML=pb.map(b=>{
-    const w=BARRIER_WEIGHTS[b]||50,pct=Math.round((w/mw)*100);
-    return `<div class="barrier-row"><div class="barrier-meta"><span class="barrier-name">${BARRIER_LABELS[b]||b}</span><span class="barrier-pct">${pct}% navigation priority</span></div><div class="bar-track"><div class="bar-fill" data-pct="${pct}"></div></div></div>`;
-  }).join('');
+  const pb=q2.length?q2:['info']; const mw=Math.max(...pb.map(b=>BARRIER_WEIGHTS[b]||50));
+  document.getElementById('barrier-profile').innerHTML=pb.map(b=>{const w=BARRIER_WEIGHTS[b]||50,pct=Math.round((w/mw)*100);return `<div class="barrier-row"><div class="barrier-meta"><span class="barrier-name">${BARRIER_LABELS[b]||b}</span><span class="barrier-pct">${pct}% navigation priority</span></div><div class="bar-track"><div class="bar-fill" data-pct="${pct}"></div></div></div>`;}).join('');
   setTimeout(()=>document.querySelectorAll('.bar-fill').forEach(el=>el.style.width=el.dataset.pct+'%'),300);
 
   const whyR=[];
@@ -965,31 +1171,36 @@ function buildResults() {
 
   document.getElementById('match-count').textContent=`(${scored.length} matches)`;
   document.getElementById('resource-list').innerHTML=scored.map((r,i)=>{
-    const wp=[];
-    r.reasons.forEach(b=>{if(r.why[b]) wp.push(r.why[b]);});
-    q4.forEach(a=>{if(r.access.includes(a)&&r.why[a]&&!wp.includes(r.why[a])) wp.push(r.why[a]);});
+    const wp=[]; r.reasons.forEach(b=>{if(r.why[b])wp.push(r.why[b]);}); q4.forEach(a=>{if(r.access.includes(a)&&r.why[a]&&!wp.includes(r.why[a]))wp.push(r.why[a]);});
     const whyText=wp.slice(0,2).join(' ');
-    const linksHtml=r.links.map(l=>`<a href="${l.url}" target="_blank" rel="noopener" class="res-btn${l.primary?' primary':''}"><i class="ti ${l.icon}"></i>${l.label}</a>`).join('');
-    const accessChips=r.access.map(a=>`<span class="chip"><i class="ti ti-${a==='video'?'video':a==='phone'?'phone':a==='text'?'message':'map-pin'}" style="font-size:11px"></i>${ACCESS_LABELS[a]}</span>`).join('');
-    return `<div class="resource-card${i===0?' top-match':''}">
-      <div class="resource-header">${i===0?'<span class="badge badge-top">Top match</span>':''}<span class="badge ${r.badge==='free'?'badge-free':'badge-low'}">${r.badge==='free'?'Free':'Low cost'}</span><span class="resource-name">${r.name}</span></div>
-      <div class="resource-desc">${r.desc}</div>
-      ${whyText?`<div class="why-box"><strong>Why this matches you:</strong> ${whyText}</div>`:''}
-      <div class="resource-actions">${linksHtml}</div>
-      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;">${accessChips}${zip&&r.barriers.includes('transport')?`<span class="chip"><i class="ti ti-map-pin" style="font-size:11px"></i>Near ${zip}</span>`:''}</div>
-    </div>`;
+    const linksHtml=(r.links||[]).map(l=>`<a href="${l.url}" target="_blank" rel="noopener" class="res-btn${l.primary?' primary':''}"><i class="ti ${l.icon}"></i>${l.label}</a>`).join('');
+    const accessChips=(r.access||[]).map(a=>`<span class="chip"><i class="ti ti-${a==='video'?'video':a==='phone'?'phone':a==='text'?'message':'map-pin'}" style="font-size:11px"></i>${ACCESS_LABELS[a]}</span>`).join('');
+    return `<div class="resource-card${i===0?' top-match':''}"><div class="resource-header">${i===0?'<span class="badge badge-top">Top match</span>':''}<span class="badge ${r.badge==='free'||r.cost_badge==='free'?'badge-free':'badge-low'}">${r.badge==='free'||r.cost_badge==='free'?'Free':'Low cost'}</span><span class="resource-name">${r.name}</span></div><div class="resource-desc">${r.desc||r.description}</div>${whyText?`<div class="why-box"><strong>Why this matches you:</strong> ${whyText}</div>`:''}<div class="resource-actions">${linksHtml}</div><div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;">${accessChips}${zip&&(r.barriers||[]).includes('transport')?`<span class="chip"><i class="ti ti-map-pin" style="font-size:11px"></i>Near ${zip}</span>`:''}</div></div>`;
   }).join('');
 
-  const steps=[];
-  if(q2.includes('cost')||q2.includes('transport')) steps.push({t:'Start with your top match today',b:scored[0]?`"${scored[0].name}" is your best fit. ${scored[0].badge==='free'?'It\'s free — no insurance needed.':'Financial aid is available — ask when you first reach out.'}`:'Reach out to the top resource listed above.'});
-  else steps.push({t:`Reach out to "${scored[0]?.name||'your top match'}"`,b:'This is your top BridgeLogic match. Contacting them this week gives you the best chance of a timely connection.'});
-  if(q2.includes('cost')) steps.push({t:'Ask about free or sliding-scale fees',b:`Say "I don't have insurance — do you offer sliding-scale or free options?" when you call. Most resources listed here do.`});
+  const steps=[]; const top=scored[0];
+  if(q2.includes('cost')||q2.includes('transport')) steps.push({t:'Start with your top match today',b:top?`"${top.name}" is your best fit. ${top.badge==='free'||top.cost_badge==='free'?'It\'s free — no insurance needed.':'Financial aid is available — ask when you first reach out.'}`:'Reach out to the top resource listed above.'});
+  else steps.push({t:`Reach out to "${top?.name||'your top match'}"`,b:'This is your top BridgeLogic match. Contacting them this week gives you the best chance of a timely connection.'});
+  if(q2.includes('cost')) steps.push({t:'Ask about free or sliding-scale fees',b:`Say "I don't have insurance — do you offer sliding-scale or free options?" when you call.`});
   if(q2.includes('transport')||q4.includes('video')) steps.push({t:'Request a telehealth appointment',b:'All starred resources offer remote options. You can often start within 48 hours without leaving home.'});
   if(q2.includes('language')) steps.push({t:'Request language support upfront',b:'All listed resources offer interpreter services or bilingual staff. Ask when you first contact them.'});
-  if(zip) steps.push({t:`Search locally near ZIP ${zip}`,b:'Visit findtreatment.gov to find accredited providers in your area that accept your insurance or offer free care.'});
+  if(zip) steps.push({t:`Search locally near ZIP ${zip}`,b:'Visit findtreatment.gov to find accredited providers in your area.'});
   steps.push({t:'Save or share this plan',b:'Print this page or copy the link. Consider sharing it with a trusted person in your life.'});
   document.getElementById('action-plan').innerHTML=steps.map((s,i)=>`<div class="plan-step"><div class="step-num">${i+1}</div><div class="step-content"><h3>${s.t}</h3><p>${s.b}</p></div></div>`).join('');
 }
+
+/* ── SHARED HELPERS ──────────────────────────────────── */
+function animateRing(pct) {
+  setTimeout(() => {
+    document.getElementById('ring-fill').style.strokeDashoffset = 188 - (188 * (pct / 100));
+    const el = document.getElementById('score-num');
+    let cur = 0;
+    const t = setInterval(() => { cur = Math.min(cur + 2, pct); el.textContent = cur + '%'; if (cur >= pct) clearInterval(t); }, 18);
+  }, 200);
+}
+
+/* keep old name as alias so nothing else breaks */
+function buildResults() { renderResultsLocal(); }
 
 /* ── UTILS ────────────────────────────────────────────── */
 function openSOS(){document.getElementById('sos-modal').classList.add('open');}
