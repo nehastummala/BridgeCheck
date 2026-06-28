@@ -222,14 +222,14 @@ def score_resource(resource: models.Resource, session: UserSession) -> int:
     score = 0
 
     tags = resource.tags or []
-    barriers = getattr(resource, "barriers", None) or tags
+    barriers = resource.barriers or []
     access_modes = resource.access_modes or []
 
     if session.support_type and session.support_type in tags:
         score += 4
 
     for b in session.barriers:
-        if b in barriers or b in tags:
+        if b in barriers:
             score += 3
 
     for a in session.access_prefs:
@@ -272,18 +272,15 @@ def rank_resources(session: UserSession, db: Session, limit: int = 4) -> list[di
             "is_top_match": False,
         })
 
+    scored = [x for x in scored if x["score"] > 0]
     scored.sort(key=lambda x: x["score"], reverse=True)
 
-    top = [x for x in scored if x["score"] > 0][:limit]
-
-    if not top:
-        top = scored[:limit]
+    top = scored[:limit]
 
     if top:
         top[0]["is_top_match"] = True
 
     return top
-
 # ─────────────────────────────────────────────────────────────
 # WHY-PANEL REASONS
 # Explains to the user, in plain English, why BridgeLogic
