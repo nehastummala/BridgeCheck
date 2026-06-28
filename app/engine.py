@@ -248,45 +248,38 @@ def score_resource(resource: models.Resource, session: UserSession) -> int:
     return score
 
 
-def rank_resources(
-    session: UserSession,
-    db: Session,
-    limit: int = 4,
-) -> list[dict]:
-    """
-    Fetch all resources from DB, score each, return top `limit`
-    with score, matched barriers, and why-text.
-    """
-    resources = db.query(models.Resource).filter(
-        models.Resource.is_active == True
-    ).all()
+def rank_resources(session: UserSession, db: Session, limit: int = 4) -> list[dict]:
+    resources = db.query(models.Resource).filter(models.Resource.is_active == True).all()
 
     scored = []
     for r in resources:
         sc = score_resource(r, session)
-        if sc == 0:
-            continue
+
         matched_barriers = [
             b for b in session.barriers
             if b in (r.barriers or [])
         ]
+
         why_parts = []
         for b in matched_barriers[:2]:
             why_text = (r.why_text or {}).get(b)
             if why_text:
                 why_parts.append(why_text)
+
         scored.append({
-            "resource":         r,
-            "score":            sc,
+            "resource": r,
+            "score": sc,
             "matched_barriers": matched_barriers,
-            "why_text":         " ".join(why_parts),
-            "is_top_match":     False,
+            "why_text": " ".join(why_parts),
+            "is_top_match": False,
         })
 
     scored.sort(key=lambda x: x["score"], reverse=True)
+
     top = scored[:limit]
     if top:
         top[0]["is_top_match"] = True
+
     return top
 
 
