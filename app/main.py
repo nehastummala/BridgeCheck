@@ -133,6 +133,26 @@ def analyze(req: schemas.AnalyzeRequest, db: Session = Depends(get_db)):
 
     result = run_bridgelogic(session, db)
 
+      if not result["resources"]:
+        fallback_resources = db.query(models.Resource).filter(models.Resource.is_active == True).limit(4).all()
+
+        result["resources"] = [
+            {
+                "id": r.id,
+                "name": r.name,
+                "description": r.description,
+                "cost_badge": r.cost_badge,
+                "tags": r.tags or [],
+                "access_modes": r.access_modes or [],
+                "links": r.links or [],
+                "why_text": "This resource is included as a verified support option based on your preferences.",
+                "is_top_match": i == 0,
+                "score": 1,
+                "matched_barriers": session.barriers,
+            }
+            for i, r in enumerate(fallback_resources)
+        ]
+
     # Log anonymous aggregate data (no PII)
     _log_assessment(session, result, db)
 
