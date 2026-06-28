@@ -1,71 +1,63 @@
 # BridgeCheck
 Adaptive Mental Health Navigation Platform
 
-BridgeCheck is an adaptive mental health navigation platform designed to help individuals identify barriers to accessing mental health support and connect them with resources that fit their unique circumstances.
+BridgeCheck is an adaptive mental health navigation platform that helps individuals identify barriers to accessing mental health support and connect with resources that fit their unique circumstances.
 
-> BridgeCheck is designed for informational and resource navigation purposes only. It is not a diagnostic tool and is not a substitute for professional medical or mental health care.
+BridgeCheck is designed for informational and resource navigation purposes only. It is **not** a diagnostic tool and is **not** a substitute for professional medical or mental health care.
 
 ---
 
 ## Features
 
-- Adaptive questioning powered by BridgeLogic™
+- BridgeLogic™ adaptive decision engine
+- Adaptive questioning
 - Barrier-aware resource matching
+- Recommendation confidence scoring
 - Personalized action plans
-- Match confidence scoring
-- Anonymous-by-design experience
-- Privacy-focused architecture
-- Mobile-friendly interface
+- Privacy-first design
+- Anonymous assessments
 - Emergency resource access
 
 ---
 
-## How It Works
+## Technology
 
-BridgeCheck guides users through a short adaptive check-in.
-
-BridgeLogic™ analyzes:
-
-- Reported barriers
-- Access preferences
-- Available community resources
-
-The platform then generates personalized recommendations and an action plan tailored to the user's situation.
-
----
-
-## Technologies
-
+### Frontend
 - HTML
 - CSS
 - JavaScript
 
-Future versions will include:
-
-- React
+### Backend
 - FastAPI
-- PostgreSQL
+- SQLAlchemy
+- SQLite
+- Pydantic
+
+---
+
+## API
+
+BridgeCheck includes a backend API for:
+
+- Adaptive question routing
+- Barrier profile generation
+- Recommendation confidence
+- Resource ranking
+- Personalized action plan generation
 
 ---
 
 ## Project Status
 
-Version 1.0
+**Version 1.0**
 
-Current development focuses on:
+Current features include:
 
-- Improving BridgeLogic™
-- Expanding resource databases
-- Accessibility enhancements
-- Community partnerships
-
----
-
-## Privacy
-
-BridgeCheck is designed with privacy as a core principle.
-
-The platform is intended to minimize personal information collection and provide transparent, user-focused experiences.
+- Live web application
+- BridgeLogic™ backend
+- Verified mental health resources
+- Anonymous assessment flow
+- Privacy and disclaimer pages
 
 ---
 
@@ -73,7 +65,7 @@ The platform is intended to minimize personal information collection and provide
 
 BridgeCheck does not diagnose mental health conditions or provide medical advice.
 
-If you or someone you know is experiencing a mental health emergency, contact your local emergency services or an appropriate crisis resource immediately.
+If you are experiencing a mental health emergency, contact your local emergency services or call/text **988** immediately.
 
 ---
 
