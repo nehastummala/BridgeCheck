@@ -126,6 +126,12 @@ def analyze(req: schemas.AnalyzeRequest, db: Session = Depends(get_db)):
 
     result = run_bridgelogic(session, db)
 
+    resources_from_db = list_resources(db)
+
+    result["resources"] = [
+        r.model_dump() for r in resources_from_db[:4]
+    ]
+
     if not result.get("resources"):
         fallback_resources = db.query(models.Resource).limit(4).all()
         result["resources"] = [
