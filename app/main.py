@@ -133,7 +133,7 @@ def analyze(req: schemas.AnalyzeRequest, db: Session = Depends(get_db)):
 
     result = run_bridgelogic(session, db)
 
-      if not result["resources"]:
+    if not result["resources"]:
         fallback_resources = db.query(models.Resource).filter(models.Resource.is_active == True).limit(4).all()
 
         result["resources"] = [
